@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring: Ingestion Status & Enrichment - Product Context Intelligence</title>
+    <style>
+        /* Toby Design Tokens */
+        :root {
+            --color-brand-primary: #6436bf;
+            --color-brand-primary-dark: #42247f;
+            --color-brand-primary-light: #f3effb;
+            --color-text-default: #28262c;
+            --color-text-subtle: #645e6e;
+            --color-text-placeholder: #cbc8d0;
+            --color-background-light: #f5f4f6;
+            --color-background-subtle: #faf9fa;
+            --color-border-base: #e0dee3;
+            --color-border-dark: #cbc8d0;
+            --color-action-text: #05a2f0;
+            --color-feedback-success: #36bf7f;
+            --color-feedback-success-light: #effbf5;
+            --color-feedback-warning: #eb8d0a;
+            --color-feedback-warning-light: #fef6eb;
+            --color-feedback-error: #e60f0f;
+            --color-feedback-error-light: #feecec;
+            --color-white: #ffffff;
+            
+            --spacing-xxsmall: 0.125rem;
+            --spacing-xsmall: 0.25rem;
+            --spacing-small: 0.5rem;
+            --spacing-medium: 0.75rem;
+            --spacing-large: 1rem;
+            --spacing-xlarge: 1.5rem;
+            --spacing-layout-xsmall: 2rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--color-text-default);
+            background: var(--color-background-subtle);
+            line-height: 1.5;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--color-border-base);
+            padding: var(--spacing-large) var(--spacing-layout-xsmall);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .header p {
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-layout-xsmall);
+        }
+        
+        .section {
+            background: white;
+            border: 1px solid var(--color-border-base);
+            border-radius: 8px;
+            margin-bottom: var(--spacing-xlarge);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: var(--color-background-light);
+            padding: var(--spacing-large);
+            border-bottom: 1px solid var(--color-border-base);
+        }
+        
+        .section-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .section-header p {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .section-content {
+            padding: var(--spacing-large);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-large);
+            margin-bottom: var(--spacing-xlarge);
+        }
+        
+        .stat-card {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-brand-primary);
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .entity-card {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .entity-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .entity-title {
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-small);
+        }
+        
+        .enrichment-badge {
+            padding: var(--spacing-xsmall) var(--spacing-medium);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .enrichment-complete {
+            background: var(--color-feedback-success-light);
+            color: var(--color-feedback-success);
+        }
+        
+        .enrichment-partial {
+            background: var(--color-feedback-warning-light);
+            color: var(--color-feedback-warning);
+        }
+        
+        .enrichment-low {
+            background: var(--color-feedback-error-light);
+            color: var(--color-feedback-error);
+        }
+        
+        .constraint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-medium);
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .constraint-item {
+            padding: var(--spacing-small);
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .constraint-complete {
+            background: var(--color-feedback-success-light);
+            color: var(--color-feedback-success);
+        }
+        
+        .constraint-partial {
+            background: var(--color-feedback-warning-light);
+            color: var(--color-feedback-warning);
+        }
+        
+        .constraint-missing {
+            background: var(--color-feedback-error-light);
+            color: var(--color-feedback-error);
+        }
+        
+        .entity-meta {
+            display: flex;
+            gap: var(--spacing-xlarge);
+            font-size: 0.875rem;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xxsmall);
+        }
+        
+        .meta-label {
+            color: var(--color-text-subtle);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+        }
+        
+        .recommendations {
+            padding: var(--spacing-medium);
+            background: var(--color-background-light);
+            border-radius: 4px;
+            margin-top: var(--spacing-medium);
+        }
+        
+        .recommendations-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .recommendations ol {
+            margin-left: var(--spacing-large);
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .recommendations li {
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .button {
+            display: inline-block;
+            padding: var(--spacing-small) var(--spacing-large);
+            background: white;
+            border: 1px solid var(--color-border-dark);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-default);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .button:hover {
+            border-color: var(--color-brand-primary);
+            color: var(--color-brand-primary);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--spacing-small);
+            margin-top: var(--spacing-medium);
+        }
+        
+        .coverage-bar-container {
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .coverage-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-small);
+            font-size: 0.875rem;
+        }
+        
+        .coverage-name {
+            font-weight: 600;
+        }
+        
+        .coverage-percentage {
+            color: var(--color-text-subtle);
+        }
+        
+        .coverage-bar {
+            height: 8px;
+            background: var(--color-background-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .coverage-fill {
+            height: 100%;
+            background: var(--color-brand-primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .priority-section {
+            margin-bottom: var(--spacing-xlarge);
+        }
+        
+        .priority-header {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-large);
+            padding-bottom: var(--spacing-small);
+            border-bottom: 2px solid var(--color-border-base);
+        }
+        
+        .action-list {
+            list-style: none;
+        }
+        
+        .action-item {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .action-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .action-number {
+            font-weight: 600;
+            color: var(--color-brand-primary);
+        }
+        
+        .action-priority {
+            padding: var(--spacing-xxsmall) var(--spacing-small);
+            background: var(--color-feedback-error-light);
+            color: var(--color-feedback-error);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .action-details {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            line-height: 1.6;
+        }
+        
+        /* Navigation Styles */
+        .navigation {
+            background: var(--color-brand-primary);
+            border-bottom: 2px solid var(--color-brand-primary-dark);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-layout-xsmall);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xsmall);
+        }
+        
+        .nav-item {
+            display: inline-block;
+            padding: var(--spacing-medium) var(--spacing-large);
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            color: white;
+            border-bottom-color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <div class="nav-container">
+            <a href="view1-configuration.html" class="nav-item">Configuration</a>
+            <a href="view2-monitoring.html" class="nav-item active">Monitoring</a>
+            <a href="view3-rules-management.html" class="nav-item">Rules Management</a>
+            <a href="view4-analytics.html" class="nav-item">Analytics</a>
+            <a href="view5-product-delivery-impact-dashboard.html" class="nav-item">Delivery Impact</a>
+            <a href="view6-workflow-analytics-dashboard.html" class="nav-item">Workflow Analytics</a>
+        </div>
+    </nav>
+    
+    <div class="header">
+        <div class="header-content">
+            <h1>Monitoring: Ingestion status & enrichment</h1>
+            <p>See what's captured, what's missing, and which entities have complete constraint coverage</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- System Health Overview -->
+        <div class="section">
+            <div class="section-header">
+                <h2>System health overview</h2>
+                <p>Last 24 hours activity</p>
+            </div>
+            <div class="section-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">63</div>
+                        <div class="stat-label">Components synchronized</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2,847</div>
+                        <div class="stat-label">Usage patterns detected</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">31</div>
+                        <div class="stat-label">Validation rules updated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">New HIPAA rules added</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">9/11</div>
+                        <div class="stat-label">Active integrations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gold Standard Entities -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Gold standard entities (100% enriched)</h2>
+                <p>Complete coverage across all constraint categories</p>
+            </div>
+            <div class="section-content">
+                <div class="entity-card">
+                    <div class="entity-header">
+                        <div class="entity-title">
+                            <span>✓</span>
+                            <span>Patient consent flow</span>
+                        </div>
+                        <span class="enrichment-badge enrichment-complete">100% enriched</span>
+                    </div>
+                    
+                    <div class="constraint-grid">
+                        <div class="constraint-item constraint-complete">✓ Visual: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Brand: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Accessibility: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Regulatory: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Performance: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Clinical: Complete</div>
+                    </div>
+                    
+                    <div class="entity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Usage</span>
+                            <span class="meta-value">147 instances</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Compliance</span>
+                            <span class="meta-value">98%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">View details</button>
+                        <button class="button">Use as template</button>
+                    </div>
+                </div>
+                
+                <div class="entity-card">
+                    <div class="entity-header">
+                        <div class="entity-title">
+                            <span>✓</span>
+                            <span>Medication order form</span>
+                        </div>
+                        <span class="enrichment-badge enrichment-complete">100% enriched</span>
+                    </div>
+                    
+                    <div class="constraint-grid">
+                        <div class="constraint-item constraint-complete">✓ Visual: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Brand: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Accessibility: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Regulatory: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Performance: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Clinical: Complete</div>
+                    </div>
+                    
+                    <div class="entity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Usage</span>
+                            <span class="meta-value">89 instances</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Compliance</span>
+                            <span class="meta-value">100% ⭐</span>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">View details</button>
+                        <button class="button">Use as template</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- High-Priority Gaps -->
+        <div class="section">
+            <div class="section-header">
+                <h2>High-priority gaps (50-80% enriched)</h2>
+                <p>These need attention to reach full enrichment</p>
+            </div>
+            <div class="section-content">
+                <div class="entity-card">
+                    <div class="entity-header">
+                        <div class="entity-title">
+                            <span>⚠</span>
+                            <span>Clinical notes entry</span>
+                        </div>
+                        <span class="enrichment-badge enrichment-partial">67% enriched</span>
+                    </div>
+                    
+                    <div class="constraint-grid">
+                        <div class="constraint-item constraint-complete">✓ Visual: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Brand: Complete</div>
+                        <div class="constraint-item constraint-complete">✓ Accessibility: Complete</div>
+                        <div class="constraint-item constraint-partial">⚠ Regulatory: Partial</div>
+                        <div class="constraint-item constraint-missing">✗ Performance: Missing</div>
+                        <div class="constraint-item constraint-partial">⚠ Clinical: Partial</div>
+                    </div>
+                    
+                    <div class="entity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Usage</span>
+                            <span class="meta-value">234 instances (high usage)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendations">
+                        <div class="recommendations-title">Recommended actions:</div>
+                        <ol>
+                            <li>Connect state medical board regulations</li>
+                            <li>Add performance budgets for notes interface</li>
+                            <li>Import ICD-10 diagnostic code validation</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">Take action</button>
+                        <button class="button">View details</button>
+                    </div>
+                </div>
+                
+                <div class="entity-card">
+                    <div class="entity-header">
+                        <div class="entity-title">
+                            <span>⚠</span>
+                            <span>Patient search component</span>
+                        </div>
+                        <span class="enrichment-badge enrichment-partial">75% enriched</span>
+                    </div>
+                    
+                    <div class="constraint-grid">
+                        <div class="constraint-item constraint-complete">✓ Visual: Complete</div>
+                        <div class="constraint-item constraint-partial">⚠ Brand: Partial</div>
+                        <div class="constraint-item constraint-complete">✓ Accessibility: Complete</div>
+                        <div class="constraint-item constraint-partial">⚠ Regulatory: Partial</div>
+                        <div class="constraint-item constraint-partial">⚠ Performance: Partial</div>
+                        <div class="constraint-item constraint-complete">✓ Clinical: Complete</div>
+                    </div>
+                    
+                    <div class="entity-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Usage</span>
+                            <span class="meta-value">412 instances (critical)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendations">
+                        <div class="recommendations-title">Recommended actions:</div>
+                        <ol>
+                            <li>Add empty state messaging to brand guidelines</li>
+                            <li>Import CMS patient matching requirements</li>
+                            <li>Set search-specific performance budget (&lt;500ms)</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">Take action</button>
+                        <button class="button">View details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Coverage by Source Type -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Coverage by source type</h2>
+                <p>Across all 63 components/patterns</p>
+            </div>
+            <div class="section-content">
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">Visual design</span>
+                        <span class="coverage-percentage">98% (62 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 98%"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">Brand guidelines</span>
+                        <span class="coverage-percentage">84% (53 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 84%"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">Accessibility (WCAG AA)</span>
+                        <span class="coverage-percentage">97% (61 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 97%"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">HIPAA compliance</span>
+                        <span class="coverage-percentage">86% (54 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 86%"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">State regulations</span>
+                        <span class="coverage-percentage">71% (45 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 71%"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">Performance standards</span>
+                        <span class="coverage-percentage">79% (50 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 79%"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-bar-container">
+                    <div class="coverage-label">
+                        <span class="coverage-name">Clinical terminology</span>
+                        <span class="coverage-percentage">95% (60 of 63)</span>
+                    </div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 95%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suggested Next Steps -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Suggested next steps</h2>
+                <p>Based on usage patterns and risk analysis</p>
+            </div>
+            <div class="section-content">
+                <div class="priority-section">
+                    <div class="priority-header">High priority (do this week)</div>
+                    <ul class="action-list">
+                        <li class="action-item">
+                            <div class="action-item-header">
+                                <span class="action-number">1. Complete provider dashboard enrichment</span>
+                                <span class="action-priority">URGENT</span>
+                            </div>
+                            <div class="action-title">Risk: High usage (412 instances), low coverage (35%)</div>
+                            <div class="action-details">
+                                Owner: [Assign] | Due: [Set date]
+                            </div>
+                        </li>
+                        
+                        <li class="action-item">
+                            <div class="action-item-header">
+                                <span class="action-number">2. Add state regulations for clinical notes</span>
+                                <span class="action-priority">URGENT</span>
+                            </div>
+                            <div class="action-title">Risk: Regulatory violation exposure</div>
+                            <div class="action-details">
+                                Impact: 234 instances affected<br>
+                                Owner: [Assign] | Due: [Set date]
+                            </div>
+                        </li>
+                        
+                        <li class="action-item">
+                            <div class="action-item-header">
+                                <span class="action-number">3. Performance budgets for all dashboards</span>
+                                <span class="action-priority">HIGH</span>
+                            </div>
+                            <div class="action-title">Risk: User experience degradation</div>
+                            <div class="action-details">
+                                Impact: 6 dashboard components<br>
+                                Owner: [Assign] | Due: [Set date]
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

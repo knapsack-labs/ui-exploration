@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View 6: Workflow Analytics Dashboard - Toby Design System</title>
+  <style>
+    /* Toby Design Tokens */
+    :root {
+      /* Color Tokens */
+      --color-white: #ffffff;
+      --color-black: #141316;
+      
+      /* Text Colors */
+      --color-text-default: #28262c;
+      --color-text-subtle: #645e6e;
+      --color-text-placeholder: #cbc8d0;
+      
+      /* Brand Colors */
+      --color-brand-primary-base: #6436bf;
+      --color-brand-primary-light: #f3effb;
+      --color-brand-secondary-base: #e43a5c;
+      
+      /* Action Colors */
+      --color-action-background-default: #05a2f0;
+      --color-action-background-subtle: #ebf8ff;
+      --color-action-text-default: #05a2f0;
+      
+      /* Feedback Colors */
+      --color-feedback-success-base: #36bf7f;
+      --color-feedback-success-light: #effbf5;
+      --color-feedback-success-dark: #247f55;
+      --color-feedback-error-base: #e60f0f;
+      --color-feedback-error-light: #feecec;
+      --color-feedback-warning-base: #eb8d0a;
+      --color-feedback-warning-light: #fef6eb;
+      --color-feedback-info-base: #1dd1d7;
+      --color-feedback-info-light: #edfcfd;
+      
+      /* Background Colors */
+      --color-background-light: #f5f4f6;
+      --color-background-subtle: #faf9fa;
+      
+      /* Border Colors */
+      --color-border-base: #e0dee3;
+      --color-border-light: #f5f4f6;
+      
+      /* Spacing Tokens */
+      --spacing-xxsmall: 0.125rem;
+      --spacing-xsmall: 0.25rem;
+      --spacing-small: 0.5rem;
+      --spacing-medium: 0.75rem;
+      --spacing-large: 1rem;
+      --spacing-xlarge: 1.5rem;
+      --spacing-layout-xsmall: 2rem;
+      --spacing-layout-small: 2.5rem;
+      --spacing-layout-medium: 3rem;
+      --spacing-layout-large: 4rem;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--color-background-subtle);
+      color: var(--color-text-default);
+      line-height: 1.5;
+    }
+    
+    /* Toby Components */
+    .flex {
+      display: flex;
+    }
+    
+    .flex-column {
+      flex-direction: column;
+    }
+    
+    .flex-row {
+      flex-direction: row;
+    }
+    
+    .flex-wrap {
+      flex-wrap: wrap;
+    }
+    
+    .gap-xxsmall { gap: var(--spacing-xxsmall); }
+    .gap-xsmall { gap: var(--spacing-xsmall); }
+    .gap-small { gap: var(--spacing-small); }
+    .gap-medium { gap: var(--spacing-medium); }
+    .gap-large { gap: var(--spacing-large); }
+    .gap-xlarge { gap: var(--spacing-xlarge); }
+    .gap-layout-xsmall { gap: var(--spacing-layout-xsmall); }
+    .gap-layout-medium { gap: var(--spacing-layout-medium); }
+    
+    .justify-space-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .align-center { align-items: center; }
+    .align-baseline { align-items: baseline; }
+    
+    /* Text Components */
+    .text-title {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--color-text-default);
+    }
+    
+    .text-heading {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--color-text-default);
+    }
+    
+    .text-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-subtle);
+    }
+    
+    .text-body {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--color-text-default);
+    }
+    
+    .text-body-small {
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    
+    .text-subtle {
+      color: var(--color-text-subtle);
+    }
+    
+    .text-bold {
+      font-weight: 600;
+    }
+    
+    /* Card Component */
+    .card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border-base);
+      border-radius: 8px;
+      padding: var(--spacing-layout-xsmall);
+      flex: 1;
+      min-width: 280px;
+    }
+    
+    /* Badge Component */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--spacing-xsmall) var(--spacing-small);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    
+    .badge-success {
+      background: var(--color-feedback-success-light);
+      color: var(--color-feedback-success-dark);
+    }
+    
+    .badge-info {
+      background: var(--color-feedback-info-light);
+      color: var(--color-action-text-default);
+    }
+    
+    .badge-warning {
+      background: var(--color-feedback-warning-light);
+      color: var(--color-feedback-warning-base);
+    }
+    
+    .badge-error {
+      background: var(--color-feedback-error-light);
+      color: var(--color-feedback-error-base);
+    }
+    
+    .badge-neutral {
+      background: var(--color-background-light);
+      color: var(--color-text-default);
+    }
+    
+    /* Divider Component */
+    .divider {
+      height: 1px;
+      background: var(--color-border-base);
+      width: 100%;
+      margin: var(--spacing-medium) 0;
+    }
+    
+    /* Icon placeholder */
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    .icon-success { color: var(--color-feedback-success-base); }
+    .icon-info { color: var(--color-action-text-default); }
+    .icon-primary { color: var(--color-brand-primary-base); }
+    .icon-warning { color: var(--color-feedback-warning-base); }
+    .icon-error { color: var(--color-feedback-error-base); }
+    
+    /* Color indicators */
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .dot-primary { background: var(--color-brand-primary-base); }
+    .dot-success { background: var(--color-feedback-success-base); }
+    .dot-warning { background: var(--color-feedback-warning-base); }
+    .dot-error { background: var(--color-feedback-error-base); }
+    .dot-info { background: var(--color-action-text-default); }
+    
+    /* Color classes */
+    .color-success { color: var(--color-feedback-success-base); }
+    .color-primary { color: var(--color-brand-primary-base); }
+    .color-warning { color: var(--color-feedback-warning-base); }
+    .color-error { color: var(--color-feedback-error-base); }
+    
+    /* Table Component */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-white);
+    }
+    
+    th {
+      text-align: left;
+      padding: var(--spacing-medium) var(--spacing-small);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-subtle);
+      border-bottom: 2px solid var(--color-border-base);
+    }
+    
+    td {
+      padding: var(--spacing-medium) var(--spacing-small);
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    tr:hover {
+      background: var(--color-background-subtle);
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--color-background-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-success { background: var(--color-feedback-success-base); }
+    .progress-warning { background: var(--color-feedback-warning-base); }
+    .progress-error { background: var(--color-feedback-error-base); }
+    
+    /* Metric number styling */
+    .metric-large {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    
+    .metric-medium {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    
+    /* Header */
+    .header {
+      background: white;
+      border-bottom: 1px solid var(--color-border-base);
+      padding: var(--spacing-large) var(--spacing-layout-xsmall);
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xsmall);
+    }
+    
+    .header p {
+      color: var(--color-text-subtle);
+      font-size: 0.875rem;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--spacing-layout-xsmall);
+    }
+    
+    /* Section header */
+    .section-header {
+      margin-bottom: var(--spacing-layout-xsmall);
+      padding-bottom: var(--spacing-medium);
+      border-bottom: 2px solid var(--color-border-base);
+    }
+    
+    /* Chart placeholder */
+    .chart-placeholder {
+      background: var(--color-background-light);
+      border-radius: 4px;
+      padding: var(--spacing-layout-small);
+      text-align: center;
+      color: var(--color-text-subtle);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+    }
+    
+    /* Workflow visualization */
+    .workflow-step {
+      background: var(--color-white);
+      border: 2px solid var(--color-border-base);
+      border-radius: 8px;
+      padding: var(--spacing-medium);
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .workflow-arrow {
+      color: var(--color-text-subtle);
+      font-size: 1.5rem;
+      padding: 0 var(--spacing-small);
+    }
+    
+    /* Iteration indicator */
+    .iteration-loop {
+      border: 2px dashed var(--color-brand-primary-base);
+      border-radius: 8px;
+      padding: var(--spacing-large);
+      background: var(--color-brand-primary-light);
+    }
+    
+    /* Callout box */
+    .callout {
+      background: var(--color-feedback-info-light);
+      border-left: 4px solid var(--color-action-text-default);
+      padding: var(--spacing-large);
+      border-radius: 4px;
+      margin: var(--spacing-large) 0;
+    }
+    
+    .callout-warning {
+      background: var(--color-feedback-warning-light);
+      border-left-color: var(--color-feedback-warning-base);
+    }
+    
+    .callout-success {
+      background: var(--color-feedback-success-light);
+      border-left-color: var(--color-feedback-success-base);
+    }
+    
+    /* Navigation Styles */
+    .navigation {
+      background: var(--color-brand-primary-base);
+      border-bottom: 2px solid #42247f;
+    }
+    
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-layout-xsmall);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xsmall);
+    }
+    
+    .nav-item {
+      display: inline-block;
+      padding: var(--spacing-medium) var(--spacing-large);
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .nav-item.active {
+      color: white;
+      border-bottom-color: white;
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navigation">
+    <div class="nav-container">
+      <a href="view1-configuration.html" class="nav-item">Configuration</a>
+      <a href="view2-monitoring.html" class="nav-item">Monitoring</a>
+      <a href="view3-rules-management.html" class="nav-item">Rules Management</a>
+      <a href="view4-analytics.html" class="nav-item">Analytics</a>
+      <a href="view5-product-delivery-impact-dashboard.html" class="nav-item">Delivery Impact</a>
+      <a href="view6-workflow-analytics-dashboard.html" class="nav-item active">Workflow Analytics</a>
+    </div>
+  </nav>
+  
+  <div class="header">
+    <div class="header-content">
+      <h1>Workflow Analytics Dashboard</h1>
+      <p>Understanding generation patterns, user intent, and systematic improvement opportunities</p>
+    </div>
+  </div>
+  
+  <div class="container">
+    
+    <div class="callout-success callout">
+      <div class="flex flex-row gap-small align-center">
+        <span class="icon icon-success">💎</span>
+        <p class="text-body-small">
+          <strong>The Data Goldmine:</strong> This view is only possible when you own the generation workflow. Without workflow ownership, you see outcomes but not causation.
+        </p>
+      </div>
+    </div>
+
+    <!-- Generation Pattern Analysis -->
+    <div class="flex flex-column gap-layout-medium">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Generation Pattern Analysis</h2>
+        <p class="text-body-small text-subtle">
+          Understanding how users iterate and refine their generations
+        </p>
+      </div>
+
+      <!-- Iteration Distribution Cards -->
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <!-- First-Try Success -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">First-Try Success</span>
+              <span class="icon icon-success">✓</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">70%</div>
+              <span class="text-body-small text-subtle">accepted without iteration</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↑ 8% vs last month</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                Patterns with highest first-try success:
+              </p>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Simple forms</span>
+                <span class="text-body-small text-bold">89%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Data tables</span>
+                <span class="text-body-small text-bold">76%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Modal dialogs</span>
+                <span class="text-body-small text-bold">71%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Single Regeneration -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Single Regeneration</span>
+              <span class="icon icon-info">↻</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">22%</div>
+              <span class="text-body-small text-subtle">one iteration to success</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-info">Stable trend</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                Most common refinement types:
+              </p>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Clarify requirement</span>
+                <span class="text-body-small text-bold">45%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Adjust styling</span>
+                <span class="text-body-small text-bold">32%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Change pattern</span>
+                <span class="text-body-small text-bold">23%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multiple Iterations -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Multiple Iterations</span>
+              <span class="icon icon-warning">⚠</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-warning">6%</div>
+              <span class="text-body-small text-subtle">2-3 regenerations needed</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-warning">↓ 3% improvement</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                Patterns requiring multiple tries:
+              </p>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Complex dashboards</span>
+                <span class="text-body-small text-bold">18%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Multi-step forms</span>
+                <span class="text-body-small text-bold">12%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Data visualizations</span>
+                <span class="text-body-small text-bold">9%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Abandoned Generations -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Abandoned</span>
+              <span class="icon icon-error">✗</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-error">2%</div>
+              <span class="text-body-small text-subtle">user gave up</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↓ 1.5% reduction</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                Top abandonment reasons:
+              </p>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Context missing</span>
+                <span class="text-body-small text-bold">42%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Pattern unclear</span>
+                <span class="text-body-small text-bold">31%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Too complex</span>
+                <span class="text-body-small text-bold">27%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Intent Analysis -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">User Intent & Behavior Signals</h2>
+        <p class="text-body-small text-subtle">
+          What users are trying to accomplish and how they refine their requests
+        </p>
+      </div>
+
+      <div class="callout">
+        <p class="text-body-small">
+          <strong>Key Insight:</strong> By analyzing refinement patterns, we can identify where composition intelligence is ambiguous or incomplete. This enables systematic improvement through fine-tuning.
+        </p>
+      </div>
+
+      <!-- Intent Classification -->
+      <div class="card">
+        <h3 class="text-label" style="margin-bottom: var(--spacing-medium);">Generation Intent Classification</h3>
+        
+        <div class="flex flex-column gap-medium">
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-row gap-small align-center">
+              <div class="dot dot-primary"></div>
+              <span class="text-body-small">New feature creation</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small text-bold">4,234 generations</span>
+              <div class="progress-bar" style="width: 100px;">
+                <div class="progress-fill progress-success" style="width: 67%;"></div>
+              </div>
+              <span class="text-body-small">67%</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-row gap-small align-center">
+              <div class="dot dot-info"></div>
+              <span class="text-body-small">Modification of existing</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small text-bold">1,847 generations</span>
+              <div class="progress-bar" style="width: 100px;">
+                <div class="progress-fill progress-success" style="width: 29%;"></div>
+              </div>
+              <span class="text-body-small">29%</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-row gap-small align-center">
+              <div class="dot dot-warning"></div>
+              <span class="text-body-small">Exploration / prototyping</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small text-bold">203 generations</span>
+              <div class="progress-bar" style="width: 100px;">
+                <div class="progress-fill progress-warning" style="width: 3%;"></div>
+              </div>
+              <span class="text-body-small">3%</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-row gap-small align-center">
+              <div class="dot dot-error"></div>
+              <span class="text-body-small">Bug fix / correction</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small text-bold">67 generations</span>
+              <div class="progress-bar" style="width: 100px;">
+                <div class="progress-fill progress-error" style="width: 1%;"></div>
+              </div>
+              <span class="text-body-small">1%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Refinement Patterns Table -->
+      <div class="card">
+        <h3 class="text-label" style="margin-bottom: var(--spacing-medium);">Most Common Refinement Patterns</h3>
+        <p class="text-body-small text-subtle" style="margin-bottom: var(--spacing-medium);">
+          When users regenerate, what are they clarifying or changing?
+        </p>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Refinement Type</th>
+                <th>Occurrences</th>
+                <th>Success Rate</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="flex flex-column gap-xsmall">
+                    <span class="text-body-small text-bold">"Make it more compact"</span>
+                    <span class="text-body-small text-subtle">User wants tighter spacing</span>
+                  </div>
+                </td>
+                <td>487</td>
+                <td><span class="badge badge-success">92% success</span></td>
+                <td><span class="badge badge-neutral">Working well</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="flex flex-column gap-xsmall">
+                    <span class="text-body-small text-bold">"Add validation to all fields"</span>
+                    <span class="text-body-small text-subtle">Missing form validation</span>
+                  </div>
+                </td>
+                <td>342</td>
+                <td><span class="badge badge-warning">67% success</span></td>
+                <td><span class="badge badge-warning">Improve pattern</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="flex flex-column gap-xsmall">
+                    <span class="text-body-small text-bold">"Use the dashboard layout pattern"</span>
+                    <span class="text-body-small text-subtle">User specifying composition pattern</span>
+                  </div>
+                </td>
+                <td>289</td>
+                <td><span class="badge badge-success">94% success</span></td>
+                <td><span class="badge badge-neutral">Working well</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="flex flex-column gap-xsmall">
+                    <span class="text-body-small text-bold">"Make it accessible"</span>
+                    <span class="text-body-small text-subtle">First generation missed a11y</span>
+                  </div>
+                </td>
+                <td>234</td>
+                <td><span class="badge badge-error">54% success</span></td>
+                <td><span class="badge badge-error">Fix a11y context</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="flex flex-column gap-xsmall">
+                    <span class="text-body-small text-bold">"Not like that, simpler"</span>
+                    <span class="text-body-small text-subtle">Over-engineered solution</span>
+                  </div>
+                </td>
+                <td>198</td>
+                <td><span class="badge badge-warning">71% success</span></td>
+                <td><span class="badge badge-warning">Adjust defaults</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Effectiveness Analysis -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Real-Time Context Effectiveness</h2>
+        <p class="text-body-small text-subtle">
+          Which context pieces actually contributed to successful generation?
+        </p>
+      </div>
+
+      <div class="callout-success callout">
+        <p class="text-body-small">
+          <strong>ML Training Signal:</strong> By tracking which context pieces led to accepted generations, we can fine-tune context retrieval and weighting. This feedback loop is only possible when you own the workflow.
+        </p>
+      </div>
+
+      <!-- Context Performance Cards -->
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">High-Value Context</span>
+              <span class="icon icon-success">⭐</span>
+            </div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Component specifications</span>
+                <span class="text-body-small text-bold color-success">97% useful</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Composition patterns</span>
+                <span class="text-body-small text-bold color-success">94% useful</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Token definitions</span>
+                <span class="text-body-small text-bold color-success">92% useful</span>
+              </div>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Include more aggressively in context
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Medium-Value Context</span>
+              <span class="icon icon-info">○</span>
+            </div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Brand guidelines</span>
+                <span class="text-body-small text-bold color-primary">79% useful</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Usage examples</span>
+                <span class="text-body-small text-bold color-primary">76% useful</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Accessibility rules</span>
+                <span class="text-body-small text-bold color-primary">73% useful</span>
+              </div>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Include selectively based on context
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Low-Value Context</span>
+              <span class="icon icon-warning">⚠</span>
+            </div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Historical decisions</span>
+                <span class="text-body-small text-bold color-warning">34% useful</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Related components</span>
+                <span class="text-body-small text-bold color-warning">28% useful</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Alternative patterns</span>
+                <span class="text-body-small text-bold color-warning">21% useful</span>
+              </div>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Exclude or drastically reduce in context
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Systematic Improvement Opportunities -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Systematic Improvement Opportunities</h2>
+        <p class="text-body-small text-subtle">
+          Patterns identified from workflow data that indicate where to improve composition intelligence
+        </p>
+      </div>
+
+      <!-- Improvement Opportunities Cards -->
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Critical Issue</span>
+              <span class="badge badge-error">High Priority</span>
+            </div>
+            
+            <h3 class="text-body text-bold">Accessibility Context Incomplete</h3>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                234 refinements requested "make it accessible" after first generation
+              </p>
+              
+              <div class="divider"></div>
+              
+              <p class="text-body-small"><strong>Root cause:</strong> A11y rules not comprehensive enough for complex components</p>
+              
+              <p class="text-body-small"><strong>Action:</strong> Expand accessibility context, especially for:
+                <br/>• Form field labels
+                <br/>• Keyboard navigation
+                <br/>• Screen reader announcements
+              </p>
+              
+              <p class="text-body-small"><strong>Expected impact:</strong> Reduce "make it accessible" refinements by 70%</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Pattern Ambiguity</span>
+              <span class="badge badge-warning">Medium Priority</span>
+            </div>
+            
+            <h3 class="text-body text-bold">Dashboard Layout Unclear</h3>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                147 generations required 2+ iterations for dashboard layouts
+              </p>
+              
+              <div class="divider"></div>
+              
+              <p class="text-body-small"><strong>Root cause:</strong> Two competing dashboard patterns in design system, AI can't distinguish when to use each</p>
+              
+              <p class="text-body-small"><strong>Action:</strong> Clarify dashboard pattern usage:
+                <br/>• Analytics dashboards → Grid layout
+                <br/>• Control dashboards → Sidebar + content
+              </p>
+              
+              <p class="text-body-small"><strong>Expected impact:</strong> Increase first-try success from 54% to 82%</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Optimization</span>
+              <span class="badge badge-info">Low Priority</span>
+            </div>
+            
+            <h3 class="text-body text-bold">Historical Context Noise</h3>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">
+                Historical decision context shows 34% usefulness - dragging down overall quality
+              </p>
+              
+              <div class="divider"></div>
+              
+              <p class="text-body-small"><strong>Root cause:</strong> Including rationale for past decisions adds tokens without helping generation</p>
+              
+              <p class="text-body-small"><strong>Action:</strong> Remove historical context from generation:
+                <br/>• Keep outcomes (what was decided)
+                <br/>• Remove rationale (why it was decided)
+              </p>
+              
+              <p class="text-body-small"><strong>Expected impact:</strong> Reduce context tokens by 18%, improve speed by 12%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time-to-Success Analysis -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Time-to-Success Analysis</h2>
+        <p class="text-body-small text-subtle">
+          How long does it take users to get from idea to accepted implementation?
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="text-label" style="margin-bottom: var(--spacing-medium);">Average Time by Iteration Count</h3>
+        
+        <div class="flex flex-column gap-large">
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall">
+              <span class="text-body-small text-bold">First try success</span>
+              <span class="text-body-small text-subtle">70% of generations</span>
+            </div>
+            <div class="flex flex-column gap-xsmall" style="text-align: right;">
+              <span class="metric-medium color-success">2.3 min</span>
+              <span class="text-body-small text-subtle">median time</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall">
+              <span class="text-body-small text-bold">One regeneration</span>
+              <span class="text-body-small text-subtle">22% of generations</span>
+            </div>
+            <div class="flex flex-column gap-xsmall" style="text-align: right;">
+              <span class="metric-medium color-primary">5.7 min</span>
+              <span class="text-body-small text-subtle">median time</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall">
+              <span class="text-body-small text-bold">Multiple iterations</span>
+              <span class="text-body-small text-subtle">6% of generations</span>
+            </div>
+            <div class="flex flex-column gap-xsmall" style="text-align: right;">
+              <span class="metric-medium color-warning">14.2 min</span>
+              <span class="text-body-small text-subtle">median time</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall">
+              <span class="text-body-small text-bold">Abandoned</span>
+              <span class="text-body-small text-subtle">2% of generations</span>
+            </div>
+            <div class="flex flex-column gap-xsmall" style="text-align: right;">
+              <span class="metric-medium color-error">23.8 min</span>
+              <span class="text-body-small text-subtle">before giving up</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="callout">
+          <p class="text-body-small">
+            <strong>Insight:</strong> Users who abandon have typically tried for 23+ minutes. This suggests the problem is not user impatience but genuine context/pattern gaps that prevent success.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ML Training Signals -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">ML Training Signals & Fine-Tuning Opportunities</h2>
+        <p class="text-body-small text-subtle">
+          High-quality training data collected from workflow patterns
+        </p>
+      </div>
+
+      <div class="callout-success callout">
+        <div class="flex flex-row gap-small align-center">
+          <span class="icon icon-success">🎯</span>
+          <div class="flex flex-column gap-xsmall">
+            <p class="text-body-small text-bold">
+              This is what you get from owning the workflow
+            </p>
+            <p class="text-body-small">
+              Without workflow ownership, you can't collect these training signals. Dashboard analytics show outcomes, but ML requires understanding the path to those outcomes.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Data Quality -->
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">High-Quality Training Pairs</span>
+              <span class="icon icon-success">✓</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">4,423</div>
+              <span class="text-body-small text-subtle">this month</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">Training pair quality criteria:</p>
+              <p class="text-body-small">✓ Clear requirement → accepted output</p>
+              <p class="text-body-small">✓ Context used was relevant</p>
+              <p class="text-body-small">✓ Passed all validation</p>
+              <p class="text-body-small">✓ No manual edits needed</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Refinement Patterns</span>
+              <span class="icon icon-info">↻</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">1,389</div>
+              <span class="text-body-small text-subtle">multi-step journeys</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">Shows iteration patterns:</p>
+              <p class="text-body-small">• Initial attempt</p>
+              <p class="text-body-small">• User clarification</p>
+              <p class="text-body-small">• Successful refinement</p>
+              <p class="text-body-small">• Context that helped</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Failure Analysis Data</span>
+              <span class="icon icon-warning">⚠</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-warning">127</div>
+              <span class="text-body-small text-subtle">abandoned attempts</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <p class="text-body-small text-subtle">Shows where system fails:</p>
+              <p class="text-body-small">• Requirements we can't handle</p>
+              <p class="text-body-small">• Patterns we're missing</p>
+              <p class="text-body-small">• Context gaps to fill</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fine-Tuning Impact Projection -->
+      <div class="card" style="margin-top: var(--spacing-layout-xsmall);">
+        <h3 class="text-label" style="margin-bottom: var(--spacing-medium);">Projected Fine-Tuning Impact</h3>
+        <p class="text-body-small text-subtle" style="margin-bottom: var(--spacing-large);">
+          Based on training data collected this month, here's what we expect to improve:
+        </p>
+        
+        <div class="flex flex-column gap-large">
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall" style="flex: 1;">
+              <span class="text-body-small text-bold">Context retrieval accuracy</span>
+              <span class="text-body-small text-subtle">Better selection of relevant context</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small">83.6% → 91.2%</span>
+              <span class="badge badge-success">+7.6 points</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall" style="flex: 1;">
+              <span class="text-body-small text-bold">Pattern disambiguation</span>
+              <span class="text-body-small text-subtle">Choose correct pattern when multiple similar</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small">91.3% → 96.8%</span>
+              <span class="badge badge-success">+5.5 points</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall" style="flex: 1;">
+              <span class="text-body-small text-bold">First-try success rate</span>
+              <span class="text-body-small text-subtle">Overall generation quality improvement</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small">70% → 78%</span>
+              <span class="badge badge-success">+8 points</span>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-space-between align-center">
+            <div class="flex flex-column gap-xsmall" style="flex: 1;">
+              <span class="text-body-small text-bold">Abandonment rate</span>
+              <span class="text-body-small text-subtle">Fewer users giving up</span>
+            </div>
+            <div class="flex flex-row gap-small align-center">
+              <span class="text-body-small">2% → 0.8%</span>
+              <span class="badge badge-success">-60% reduction</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="callout-success callout">
+          <p class="text-body-small">
+            <strong>Compounding Effect:</strong> These improvements create a virtuous cycle. Better first-try success → less iteration → faster delivery → more usage → more training data → even better quality.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="flex flex-column gap-medium" style="margin-top: var(--spacing-layout-large); padding-top: var(--spacing-layout-xsmall); border-top: 2px solid var(--color-border-base);">
+      <h2 class="text-heading">Why Workflow Analytics Matters</h2>
+      
+      <div class="callout-warning callout">
+        <div class="flex flex-column gap-medium">
+          <p class="text-body">
+            <strong>The Strategic Question:</strong> Can you build a valuable business on dashboard + ecosystem alone, or do you need workflow ownership for systematic improvement?
+          </p>
+          
+          <div class="divider"></div>
+          
+          <div class="flex flex-column gap-small">
+            <p class="text-body-small text-bold">What you get from Dashboard + Ecosystem:</p>
+            <p class="text-body-small">• Outcome metrics (pass rates, defect rates, velocity)</p>
+            <p class="text-body-small">• Usage analytics (which patterns used, how often)</p>
+            <p class="text-body-small">• Compliance reporting (validation results)</p>
+            <p class="text-body-small">• Broad distribution (every tool can integrate)</p>
+          </div>
+          
+          <div class="divider"></div>
+          
+          <div class="flex flex-column gap-small">
+            <p class="text-body-small text-bold">What you ONLY get from Workflow Ownership:</p>
+            <p class="text-body-small">• Intent signals (what users are trying to accomplish)</p>
+            <p class="text-body-small">• Iteration patterns (how users refine requests)</p>
+            <p class="text-body-small">• Context effectiveness (which context actually helps)</p>
+            <p class="text-body-small">• Training data for ML/fine-tuning</p>
+            <p class="text-body-small">• Systematic improvement feedback loop</p>
+          </div>
+          
+          <div class="divider"></div>
+          
+          <p class="text-body-small">
+            <strong>The Trade-off:</strong> Dashboard + ecosystem has better distribution. Workflow ownership has better data. Can you win on context quality without the workflow data goldmine?
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="flex flex-column gap-small" style="margin-top: var(--spacing-layout-large); padding-top: var(--spacing-layout-xsmall); border-top: 1px solid var(--color-border-base);">
+      <p class="text-body-small text-subtle">
+        <strong>Note:</strong> This view represents the workflow analytics you would have access to if you own the generation UI (IPE). Without workflow ownership, these insights are not available through dashboard analytics alone.
+      </p>
+      <p class="text-body-small text-subtle">
+        Built with the <strong>Toby Design System</strong> to demonstrate what View 6 would look like in your product.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

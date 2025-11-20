@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration: Sources & Weighting - Product Context Intelligence</title>
+    <style>
+        /* Toby Design Tokens */
+        :root {
+            /* Colors */
+            --color-brand-primary: #6436bf;
+            --color-brand-primary-dark: #42247f;
+            --color-brand-primary-light: #f3effb;
+            --color-text-default: #28262c;
+            --color-text-subtle: #645e6e;
+            --color-text-placeholder: #cbc8d0;
+            --color-background-light: #f5f4f6;
+            --color-background-subtle: #faf9fa;
+            --color-border-base: #e0dee3;
+            --color-border-dark: #cbc8d0;
+            --color-action-text: #05a2f0;
+            --color-action-background: #05a2f0;
+            --color-feedback-success: #36bf7f;
+            --color-feedback-success-light: #effbf5;
+            --color-feedback-warning: #eb8d0a;
+            --color-feedback-warning-light: #fef6eb;
+            --color-feedback-error: #e60f0f;
+            --color-feedback-error-light: #feecec;
+            
+            /* Spacing */
+            --spacing-xxsmall: 0.125rem;
+            --spacing-xsmall: 0.25rem;
+            --spacing-small: 0.5rem;
+            --spacing-medium: 0.75rem;
+            --spacing-large: 1rem;
+            --spacing-xlarge: 1.5rem;
+            --spacing-layout-xsmall: 2rem;
+            --spacing-layout-small: 2.5rem;
+            --spacing-layout-medium: 3rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--color-text-default);
+            background: var(--color-background-subtle);
+            line-height: 1.5;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--color-border-base);
+            padding: var(--spacing-large) var(--spacing-layout-xsmall);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .header p {
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-layout-xsmall);
+        }
+        
+        .section {
+            background: white;
+            border: 1px solid var(--color-border-base);
+            border-radius: 8px;
+            margin-bottom: var(--spacing-xlarge);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: var(--color-background-light);
+            padding: var(--spacing-large);
+            border-bottom: 1px solid var(--color-border-base);
+        }
+        
+        .section-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .section-header p {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .section-content {
+            padding: var(--spacing-large);
+        }
+        
+        .source-item {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .source-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .source-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .source-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-medium);
+        }
+        
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .source-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .source-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-large);
+            margin-bottom: var(--spacing-medium);
+            font-size: 0.875rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-small);
+        }
+        
+        .meta-label {
+            color: var(--color-text-subtle);
+        }
+        
+        .status-badge {
+            padding: var(--spacing-xsmall) var(--spacing-small);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-healthy {
+            background: var(--color-feedback-success-light);
+            color: var(--color-feedback-success);
+        }
+        
+        .status-warning {
+            background: var(--color-feedback-warning-light);
+            color: var(--color-feedback-warning);
+        }
+        
+        .status-error {
+            background: var(--color-feedback-error-light);
+            color: var(--color-feedback-error);
+        }
+        
+        .source-details {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            line-height: 1.6;
+        }
+        
+        .source-details ul {
+            list-style: none;
+            margin: var(--spacing-small) 0;
+        }
+        
+        .source-details li {
+            padding: var(--spacing-xsmall) 0;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: var(--spacing-small) var(--spacing-large);
+            background: white;
+            border: 1px solid var(--color-border-dark);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-default);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .button:hover {
+            border-color: var(--color-brand-primary);
+            color: var(--color-brand-primary);
+        }
+        
+        .button-primary {
+            background: var(--color-brand-primary);
+            border-color: var(--color-brand-primary);
+            color: white;
+        }
+        
+        .button-primary:hover {
+            background: var(--color-brand-primary-dark);
+            border-color: var(--color-brand-primary-dark);
+            color: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--spacing-small);
+            margin-top: var(--spacing-medium);
+        }
+        
+        .add-button {
+            width: 100%;
+            padding: var(--spacing-large);
+            border: 2px dashed var(--color-border-base);
+            border-radius: 6px;
+            background: var(--color-background-subtle);
+            color: var(--color-action-text);
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .add-button:hover {
+            border-color: var(--color-brand-primary);
+            background: var(--color-brand-primary-light);
+        }
+        
+        .weighting-scenario {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .scenario-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .scenario-description {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .weight-group {
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .weight-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .weight-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .weight-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-medium);
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .weight-name {
+            flex: 0 0 200px;
+            font-size: 0.875rem;
+        }
+        
+        .weight-bar-container {
+            flex: 1;
+            height: 24px;
+            background: var(--color-background-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .weight-bar {
+            height: 100%;
+            background: var(--color-brand-primary);
+            transition: width 0.3s ease;
+        }
+        
+        .weight-value {
+            flex: 0 0 50px;
+            text-align: right;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .rationale {
+            margin-top: var(--spacing-medium);
+            padding: var(--spacing-medium);
+            background: var(--color-background-light);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        /* Navigation Styles */
+        .navigation {
+            background: var(--color-brand-primary);
+            border-bottom: 2px solid var(--color-brand-primary-dark);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-layout-xsmall);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xsmall);
+        }
+        
+        .nav-item {
+            display: inline-block;
+            padding: var(--spacing-medium) var(--spacing-large);
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            color: white;
+            border-bottom-color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <div class="nav-container">
+            <a href="view1-configuration.html" class="nav-item active">Configuration</a>
+            <a href="view2-monitoring.html" class="nav-item">Monitoring</a>
+            <a href="view3-rules-management.html" class="nav-item">Rules Management</a>
+            <a href="view4-analytics.html" class="nav-item">Analytics</a>
+            <a href="view5-product-delivery-impact-dashboard.html" class="nav-item">Delivery Impact</a>
+            <a href="view6-workflow-analytics-dashboard.html" class="nav-item">Workflow Analytics</a>
+        </div>
+    </nav>
+    
+    <div class="header">
+        <div class="header-content">
+            <h1>Configuration: Sources & weighting</h1>
+            <p>Define where your product context lives and what matters most in different scenarios</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Core Design System Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Core design system</h2>
+                <p>Component libraries, design files, and tokens</p>
+            </div>
+            <div class="section-content">
+                <div class="source-item">
+                    <div class="source-header">
+                        <div class="source-title">
+                            <span class="status-icon">✓</span>
+                            <span class="source-name">Figma: acme-retail-design-system.fig</span>
+                        </div>
+                        <span class="status-badge status-healthy">Healthy</span>
+                    </div>
+                    <div class="source-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Last sync:</span>
+                            <span>2 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="source-details">
+                        Captured: 52 components, 189 variants, 94 design tokens
+                    </div>
+                    <div class="button-group">
+                        <button class="button">View details</button>
+                        <button class="button">Resync now</button>
+                    </div>
+                </div>
+                
+                <div class="source-item">
+                    <div class="source-header">
+                        <div class="source-title">
+                            <span class="status-icon">✓</span>
+                            <span class="source-name">GitHub: acme-retail-org/component-library</span>
+                        </div>
+                        <span class="status-badge status-healthy">Healthy</span>
+                    </div>
+                    <div class="source-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Last sync:</span>
+                            <span>15 minutes ago (auto-sync on push)</span>
+                        </div>
+                    </div>
+                    <div class="source-details">
+                        Captured: 52 components, 1,847 usage instances across codebase
+                    </div>
+                    <div class="button-group">
+                        <button class="button">View repository</button>
+                        <button class="button">Configure sync</button>
+                    </div>
+                </div>
+                
+                <div class="source-item">
+                    <div class="source-header">
+                        <div class="source-title">
+                            <span class="status-icon">✓</span>
+                            <span class="source-name">Design tokens: tokens.json</span>
+                        </div>
+                        <span class="status-badge status-healthy">Healthy</span>
+                    </div>
+                    <div class="source-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Last sync:</span>
+                            <span>1 day ago</span>
+                        </div>
+                    </div>
+                    <div class="source-details">
+                        Captured: 94 tokens (colors, spacing, typography, shadows)
+                    </div>
+                    <div class="button-group">
+                        <button class="button">View tokens</button>
+                        <button class="button">Update source</button>
+                    </div>
+                </div>
+                
+                <button class="add-button">+ Add core design system source</button>
+            </div>
+        </div>
+        
+        <!-- Brand & Content Guidelines Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Brand & content guidelines</h2>
+                <p>Voice, tone, terminology, and visual standards</p>
+            </div>
+            <div class="section-content">
+                <div class="source-item">
+                    <div class="source-header">
+                        <div class="source-title">
+                            <span class="status-icon">✓</span>
+                            <span class="source-name">Brand guidelines: brand-book-2024.pdf</span>
+                        </div>
+                        <span class="status-badge status-healthy">Complete</span>
+                    </div>
+                    <div class="source-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Last processed:</span>
+                            <span>3 days ago</span>
+                        </div>
+                    </div>
+                    <div class="source-details">
+                        <ul>
+                            <li>Voice & tone rules (12 guidelines)</li>
+                            <li>Color usage beyond tokens (8 rules)</li>
+                            <li>Typography hierarchy (6 rules)</li>
+                            <li>Imagery guidelines (15 rules)</li>
+                            <li>Logo usage (4 rules)</li>
+                        </ul>
+                    </div>
+                    <div class="button-group">
+                        <button class="button">View extracted rules</button>
+                        <button class="button">Reprocess document</button>
+                    </div>
+                </div>
+                
+                <div class="source-item">
+                    <div class="source-header">
+                        <div class="source-title">
+                            <span class="status-icon">⚠</span>
+                            <span class="source-name">Marketing asset library</span>
+                        </div>
+                        <span class="status-badge status-warning">Partial</span>
+                    </div>
+                    <div class="source-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Status:</span>
+                            <span>Manual uploads only</span>
+                        </div>
+                    </div>
+                    <div class="source-details">
+                        Captured: 23 hero images, 15 icon sets<br>
+                        Recommended: Connect DAM system for automatic sync
+                    </div>
+                    <div class="button-group">
+                        <button class="button-primary">Configure DAM integration</button>
+                    </div>
+                </div>
+                
+                <button class="add-button">+ Add brand/content source</button>
+            </div>
+        </div>
+        
+        <!-- Context Weighting Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Context weighting configuration</h2>
+                <p>How sources are prioritized by scenario</p>
+            </div>
+            <div class="section-content">
+                <div class="weighting-scenario">
+                    <div class="scenario-title">AI generating product page</div>
+                    <div class="scenario-description">When AI generates new product detail pages</div>
+                    
+                    <div class="weight-group">
+                        <div class="weight-label">Critical sources (block generation if violated)</div>
+                        <div class="weight-item">
+                            <span class="weight-name">Component library (code)</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 100%"></div>
+                            </div>
+                            <span class="weight-value">100%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">WCAG AA requirements</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 100%"></div>
+                            </div>
+                            <span class="weight-value">100%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">GDPR consent flows</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 100%"></div>
+                            </div>
+                            <span class="weight-value">100%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="weight-group">
+                        <div class="weight-label">High priority sources (strong guidance)</div>
+                        <div class="weight-item">
+                            <span class="weight-name">Brand guidelines</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 85%"></div>
+                            </div>
+                            <span class="weight-value">85%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">Content style guide</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 75%"></div>
+                            </div>
+                            <span class="weight-value">75%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">Performance budgets</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 70%"></div>
+                            </div>
+                            <span class="weight-value">70%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="weight-group">
+                        <div class="weight-label">Medium priority sources (suggestions)</div>
+                        <div class="weight-item">
+                            <span class="weight-name">Figma design specs</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 50%"></div>
+                            </div>
+                            <span class="weight-value">50%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">SEO requirements</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 45%"></div>
+                            </div>
+                            <span class="weight-value">45%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rationale">
+                        <strong>Rationale:</strong> Product pages must be compliant (GDPR, WCAG) and functional (components work). Brand consistency important but not blocking. Figma is reference since this is code generation.
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">Edit weighting</button>
+                        <button class="button">Save as template</button>
+                    </div>
+                </div>
+                
+                <div class="weighting-scenario">
+                    <div class="scenario-title">Designer creating mockup in Figma</div>
+                    <div class="scenario-description">When validating Figma designs before developer handoff</div>
+                    
+                    <div class="weight-group">
+                        <div class="weight-label">Critical sources</div>
+                        <div class="weight-item">
+                            <span class="weight-name">Figma component library</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 100%"></div>
+                            </div>
+                            <span class="weight-value">100%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">Brand guidelines</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 100%"></div>
+                            </div>
+                            <span class="weight-value">100%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">Design tokens</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 100%"></div>
+                            </div>
+                            <span class="weight-value">100%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="weight-group">
+                        <div class="weight-label">High priority sources</div>
+                        <div class="weight-item">
+                            <span class="weight-name">Accessibility (WCAG)</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 85%"></div>
+                            </div>
+                            <span class="weight-value">85%</span>
+                        </div>
+                        <div class="weight-item">
+                            <span class="weight-name">Content style guide</span>
+                            <div class="weight-bar-container">
+                                <div class="weight-bar" style="width: 70%"></div>
+                            </div>
+                            <span class="weight-value">70%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rationale">
+                        <strong>Rationale:</strong> Design validation focuses on brand consistency and visual correctness. Accessibility important but checked in code too. Legal/technical validation happens downstream.
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">Edit weighting</button>
+                        <button class="button">Save as template</button>
+                    </div>
+                </div>
+                
+                <button class="add-button">+ Create custom scenario</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

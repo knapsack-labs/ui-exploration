@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules Management: Validation Configuration - Product Context Intelligence</title>
+    <style>
+        /* Toby Design Tokens */
+        :root {
+            --color-brand-primary: #6436bf;
+            --color-brand-primary-dark: #42247f;
+            --color-brand-primary-light: #f3effb;
+            --color-text-default: #28262c;
+            --color-text-subtle: #645e6e;
+            --color-background-light: #f5f4f6;
+            --color-background-subtle: #faf9fa;
+            --color-border-base: #e0dee3;
+            --color-border-dark: #cbc8d0;
+            --color-action-text: #05a2f0;
+            --color-feedback-success: #36bf7f;
+            --color-feedback-success-light: #effbf5;
+            --color-feedback-warning: #eb8d0a;
+            --color-feedback-warning-light: #fef6eb;
+            --color-feedback-error: #e60f0f;
+            --color-feedback-error-light: #feecec;
+            --color-feedback-info: #1dd1d7;
+            --color-feedback-info-light: #edfcfd;
+            
+            --spacing-xxsmall: 0.125rem;
+            --spacing-xsmall: 0.25rem;
+            --spacing-small: 0.5rem;
+            --spacing-medium: 0.75rem;
+            --spacing-large: 1rem;
+            --spacing-xlarge: 1.5rem;
+            --spacing-layout-xsmall: 2rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--color-text-default);
+            background: var(--color-background-subtle);
+            line-height: 1.5;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--color-border-base);
+            padding: var(--spacing-large) var(--spacing-layout-xsmall);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .header p {
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: var(--spacing-xlarge);
+            margin-top: var(--spacing-large);
+            font-size: 0.875rem;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-small);
+        }
+        
+        .stat-number {
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--color-brand-primary);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-layout-xsmall);
+        }
+        
+        .section {
+            background: white;
+            border: 1px solid var(--color-border-base);
+            border-radius: 8px;
+            margin-bottom: var(--spacing-xlarge);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: var(--color-background-light);
+            padding: var(--spacing-large);
+            border-bottom: 1px solid var(--color-border-base);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .rule-count {
+            padding: var(--spacing-xsmall) var(--spacing-medium);
+            background: var(--color-brand-primary-light);
+            color: var(--color-brand-primary);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: var(--spacing-large);
+        }
+        
+        .rule-card {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .rule-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .rule-title {
+            font-weight: 600;
+            font-size: 1rem;
+            flex: 1;
+        }
+        
+        .severity-badge {
+            padding: var(--spacing-xsmall) var(--spacing-medium);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .severity-error {
+            background: var(--color-feedback-error-light);
+            color: var(--color-feedback-error);
+        }
+        
+        .severity-warning {
+            background: var(--color-feedback-warning-light);
+            color: var(--color-feedback-warning);
+        }
+        
+        .severity-critical {
+            background: #990a0a;
+            color: white;
+        }
+        
+        .rule-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-medium);
+            margin-bottom: var(--spacing-medium);
+            font-size: 0.875rem;
+        }
+        
+        .rule-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xxsmall);
+        }
+        
+        .meta-label {
+            color: var(--color-text-subtle);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .meta-value {
+            font-weight: 500;
+        }
+        
+        .rule-description {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .code-example {
+            padding: var(--spacing-medium);
+            background: var(--color-background-light);
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.813rem;
+            overflow-x: auto;
+            margin: var(--spacing-medium) 0;
+        }
+        
+        .violation-list {
+            margin: var(--spacing-small) 0;
+            padding-left: var(--spacing-xlarge);
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .violation-list li {
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .button {
+            display: inline-block;
+            padding: var(--spacing-small) var(--spacing-large);
+            background: white;
+            border: 1px solid var(--color-border-dark);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-default);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .button:hover {
+            border-color: var(--color-brand-primary);
+            color: var(--color-brand-primary);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--spacing-small);
+            margin-top: var(--spacing-medium);
+        }
+        
+        .cross-source-card {
+            padding: var(--spacing-large);
+            border: 2px solid var(--color-feedback-info);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-large);
+            background: var(--color-feedback-info-light);
+        }
+        
+        .cross-source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .cross-source-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--color-text-default);
+        }
+        
+        .confidence-badge {
+            padding: var(--spacing-xsmall) var(--spacing-medium);
+            background: var(--color-feedback-success);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .sources-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-small);
+            margin: var(--spacing-medium) 0;
+        }
+        
+        .source-tag {
+            padding: var(--spacing-xsmall) var(--spacing-medium);
+            background: white;
+            border: 1px solid var(--color-border-base);
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .pattern-box {
+            padding: var(--spacing-medium);
+            background: white;
+            border: 1px solid var(--color-border-base);
+            border-radius: 4px;
+            margin: var(--spacing-medium) 0;
+        }
+        
+        .pattern-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .pattern-detail {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-large);
+        }
+        
+        .analytics-card {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+        }
+        
+        .analytics-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-medium);
+            color: var(--color-text-subtle);
+        }
+        
+        .analytics-list {
+            list-style: none;
+        }
+        
+        .analytics-item {
+            padding: var(--spacing-small) 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border-base);
+            font-size: 0.875rem;
+        }
+        
+        .analytics-item:last-child {
+            border-bottom: none;
+        }
+        
+        .analytics-number {
+            font-weight: 600;
+            color: var(--color-brand-primary);
+        }
+        
+        /* Navigation Styles */
+        .navigation {
+            background: var(--color-brand-primary);
+            border-bottom: 2px solid var(--color-brand-primary-dark);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-layout-xsmall);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xsmall);
+        }
+        
+        .nav-item {
+            display: inline-block;
+            padding: var(--spacing-medium) var(--spacing-large);
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            color: white;
+            border-bottom-color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <div class="nav-container">
+            <a href="view1-configuration.html" class="nav-item">Configuration</a>
+            <a href="view2-monitoring.html" class="nav-item">Monitoring</a>
+            <a href="view3-rules-management.html" class="nav-item active">Rules Management</a>
+            <a href="view4-analytics.html" class="nav-item">Analytics</a>
+            <a href="view5-product-delivery-impact-dashboard.html" class="nav-item">Delivery Impact</a>
+            <a href="view6-workflow-analytics-dashboard.html" class="nav-item">Workflow Analytics</a>
+        </div>
+    </nav>
+    
+    <div class="header">
+        <div class="header-content">
+            <h1>Rules management: Validation configuration</h1>
+            <p>Define, manage, and tune validation rules from all sources</p>
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-number">89</span>
+                    <span>active rules</span>
+                </div>
+                <div class="stat">
+                    <span>23 design system • 15 brand • 18 WCAG • 12 regulatory • 8 security • 6 performance • 7 cross-source</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Design System Rules -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Design system rules</div>
+                <div class="rule-count">23 rules</div>
+            </div>
+            <div class="section-content">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-title">Button cannot contain another button</div>
+                        <div class="severity-badge severity-error">Error</div>
+                    </div>
+                    
+                    <div class="rule-meta">
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">Design system spec (auto-detected)</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Violations (30 days)</span>
+                            <span class="meta-value">3 instances</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Impact</span>
+                            <span class="meta-value">Breaks keyboard navigation</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        Nesting buttons breaks keyboard navigation and creates confusing user experience.
+                    </div>
+                    
+                    <div class="code-example">
+✗ Violation:<br>
+&lt;ButtonPrimary&gt;<br>
+  Submit &lt;ButtonSecondary&gt;Cancel&lt;/ButtonSecondary&gt;<br>
+&lt;/ButtonPrimary&gt;
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">View all violations</button>
+                        <button class="button">Edit rule</button>
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-title">Card component must contain Header, Body, or Footer</div>
+                        <div class="severity-badge severity-warning">Warning</div>
+                    </div>
+                    
+                    <div class="rule-meta">
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">Design system guidelines</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Violations (30 days)</span>
+                            <span class="meta-value">12 instances</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Impact</span>
+                            <span class="meta-value">Inconsistent card usage</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        Empty Card components being used as containers. Use Container or Box component instead.
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">View violations</button>
+                        <button class="button">Suggest fix</button>
+                        <button class="button">Edit rule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Brand Guidelines Rules -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Brand guidelines rules</div>
+                <div class="rule-count">15 rules</div>
+            </div>
+            <div class="section-content">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-title">Button labels must be action-oriented (max 2-3 words)</div>
+                        <div class="severity-badge severity-warning">Warning</div>
+                    </div>
+                    
+                    <div class="rule-meta">
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">Brand guidelines - voice/tone</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Violations (30 days)</span>
+                            <span class="meta-value">31 instances</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Impact</span>
+                            <span class="meta-value">Brand dilution</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        Common violations:
+                    </div>
+                    <ul class="violation-list">
+                        <li>✗ "Click here to continue" (too wordy)</li>
+                        <li>✗ "Go" (too vague)</li>
+                        <li>✓ "Transfer funds" (correct)</li>
+                        <li>✓ "View account" (correct)</li>
+                    </ul>
+                    
+                    <div class="button-group">
+                        <button class="button">Review violations</button>
+                        <button class="button">Run auto-fix</button>
+                        <button class="button">Edit rule</button>
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-title">Error messages must use empathetic, non-technical language</div>
+                        <div class="severity-badge severity-warning">Warning</div>
+                    </div>
+                    
+                    <div class="rule-meta">
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">Brand guidelines + content style</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Violations (30 days)</span>
+                            <span class="meta-value">45 instances</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Impact</span>
+                            <span class="meta-value">Poor customer experience</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        Approved patterns:
+                    </div>
+                    <ul class="violation-list">
+                        <li>✓ "We couldn't process your transfer. Please check your account balance and try again."</li>
+                        <li>✗ "Error 402: Insufficient funds exception thrown"</li>
+                        <li>✗ "Transaction failed. Code: INSUF_FUNDS"</li>
+                    </ul>
+                    
+                    <div class="button-group">
+                        <button class="button">View violations</button>
+                        <button class="button">See approved templates</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Regulatory Rules -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Financial regulations rules</div>
+                <div class="rule-count">12 rules</div>
+            </div>
+            <div class="section-content">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-title">Account balance must have audit logging</div>
+                        <div class="severity-badge severity-critical">Critical</div>
+                    </div>
+                    
+                    <div class="rule-meta">
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Source</span>
+                            <span class="meta-value">FINRA Rule 4511 (recordkeeping)</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Violations (30 days)</span>
+                            <span class="meta-value">4 instances</span>
+                        </div>
+                        <div class="rule-meta-item">
+                            <span class="meta-label">Impact</span>
+                            <span class="meta-value">Regulatory non-compliance</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        Required: Log all account balance views with user ID, timestamp, account accessed, IP address, and session ID
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">View violations</button>
+                        <button class="button">Critical: Fix this week</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cross-Source Rules -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Cross-source rules (AI-detected)</div>
+                <div class="rule-count">7 suggested</div>
+            </div>
+            <div class="section-content">
+                <div class="cross-source-card">
+                    <div class="cross-source-header">
+                        <div class="cross-source-title">Transfer button color must meet contrast AND indicate action severity</div>
+                        <div class="confidence-badge">High confidence</div>
+                    </div>
+                    
+                    <div class="sources-list">
+                        <span class="source-tag">Design tokens</span>
+                        <span class="source-tag">WCAG</span>
+                        <span class="source-tag">Brand guidelines</span>
+                    </div>
+                    
+                    <div class="pattern-box">
+                        <div class="pattern-title">Pattern detected:</div>
+                        <div class="pattern-detail">• Design tokens define button colors</div>
+                        <div class="pattern-detail">• WCAG requires 4.5:1 contrast</div>
+                        <div class="pattern-detail">• Brand guidelines: red = error only, blue = safe action</div>
+                        <div class="pattern-detail">• Large transfers (&gt;$1000) use orange (caution)</div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        <strong>Proposed rule:</strong><br>
+                        IF transfer amount &gt; $1000<br>
+                        THEN button color = warning-orange (token)<br>
+                        AND contrast must be 7:1 (stricter than WCAG AA)<br>
+                        AND label must include amount
+                    </div>
+                    
+                    <div class="rule-description">
+                        <strong>Rationale:</strong> High-value financial actions need extra clarity
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">Review pattern</button>
+                        <button class="button">Enable rule</button>
+                        <button class="button">Refine</button>
+                    </div>
+                </div>
+                
+                <div class="cross-source-card">
+                    <div class="cross-source-header">
+                        <div class="cross-source-title">Account numbers must be masked in UI AND fully logged in audit trail</div>
+                        <div class="confidence-badge">High confidence</div>
+                    </div>
+                    
+                    <div class="sources-list">
+                        <span class="source-tag">UX patterns</span>
+                        <span class="source-tag">FINRA regulations</span>
+                        <span class="source-tag">Security policy</span>
+                    </div>
+                    
+                    <div class="pattern-box">
+                        <div class="pattern-title">Pattern detected:</div>
+                        <div class="pattern-detail">• UI shows: "Account •••• 7890"</div>
+                        <div class="pattern-detail">• Logs store: "Account 1234567890" + encrypted</div>
+                        <div class="pattern-detail">• Contradictory requirements resolved by context</div>
+                    </div>
+                    
+                    <div class="rule-description">
+                        <strong>Proposed resolution:</strong><br>
+                        Display: Last 4 digits only<br>
+                        Audit: Full number in encrypted audit log<br>
+                        API: Full number in server response, masked client-side
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="button">Review pattern</button>
+                        <button class="button">Enable rule</button>
+                        <button class="button">Refine</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rule Performance Analytics -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Rule performance analytics</div>
+            </div>
+            <div class="section-content">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-title">Most violated rules (30 days)</div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span>Accessible name required</span>
+                                <span class="analytics-number">67</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Error message empathy</span>
+                                <span class="analytics-number">45</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Button label brevity</span>
+                                <span class="analytics-number">31</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Color contrast</span>
+                                <span class="analytics-number">23</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <div class="analytics-title">Rules with highest impact</div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span>Audit logging (FINRA)</span>
+                                <span style="padding: var(--spacing-xxsmall) var(--spacing-small); background: var(--color-feedback-error-light); color: var(--color-feedback-error); border-radius: 4px; font-size: 0.75rem;">Critical</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Account numbers in URLs</span>
+                                <span style="padding: var(--spacing-xxsmall) var(--spacing-small); background: var(--color-feedback-error-light); color: var(--color-feedback-error); border-radius: 4px; font-size: 0.75rem;">Critical</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Investment disclaimers</span>
+                                <span style="padding: var(--spacing-xxsmall) var(--spacing-small); background: var(--color-feedback-error-light); color: var(--color-feedback-error); border-radius: 4px; font-size: 0.75rem;">Critical</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <div class="analytics-title">Most often auto-fixed</div>
+                        <ul class="analytics-list">
+                            <li class="analytics-item">
+                                <span>Financial amount formatting</span>
+                                <span class="analytics-number">89%</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Button label alternatives</span>
+                                <span class="analytics-number">76%</span>
+                            </li>
+                            <li class="analytics-item">
+                                <span>Color contrast (token sub)</span>
+                                <span class="analytics-number">71%</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Delivery Impact Dashboard - Toby Design System</title>
+  <style>
+    /* Toby Design Tokens */
+    :root {
+      /* Color Tokens */
+      --color-white: #ffffff;
+      --color-black: #141316;
+      
+      /* Text Colors */
+      --color-text-default: #28262c;
+      --color-text-subtle: #645e6e;
+      --color-text-placeholder: #cbc8d0;
+      
+      /* Brand Colors */
+      --color-brand-primary-base: #6436bf;
+      --color-brand-primary-light: #f3effb;
+      --color-brand-secondary-base: #e43a5c;
+      
+      /* Action Colors */
+      --color-action-background-default: #05a2f0;
+      --color-action-background-subtle: #ebf8ff;
+      --color-action-text-default: #05a2f0;
+      
+      /* Feedback Colors */
+      --color-feedback-success-base: #36bf7f;
+      --color-feedback-success-light: #effbf5;
+      --color-feedback-success-dark: #247f55;
+      --color-feedback-error-base: #e60f0f;
+      --color-feedback-error-light: #feecec;
+      --color-feedback-warning-base: #eb8d0a;
+      --color-feedback-warning-light: #fef6eb;
+      --color-feedback-info-base: #1dd1d7;
+      --color-feedback-info-light: #edfcfd;
+      
+      /* Background Colors */
+      --color-background-light: #f5f4f6;
+      --color-background-subtle: #faf9fa;
+      
+      /* Border Colors */
+      --color-border-base: #e0dee3;
+      --color-border-light: #f5f4f6;
+      
+      /* Spacing Tokens */
+      --spacing-xxsmall: 0.125rem;
+      --spacing-xsmall: 0.25rem;
+      --spacing-small: 0.5rem;
+      --spacing-medium: 0.75rem;
+      --spacing-large: 1rem;
+      --spacing-xlarge: 1.5rem;
+      --spacing-layout-xsmall: 2rem;
+      --spacing-layout-small: 2.5rem;
+      --spacing-layout-medium: 3rem;
+      --spacing-layout-large: 4rem;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--color-background-subtle);
+      color: var(--color-text-default);
+      line-height: 1.5;
+    }
+    
+    /* Toby Components */
+    .flex {
+      display: flex;
+    }
+    
+    .flex-column {
+      flex-direction: column;
+    }
+    
+    .flex-row {
+      flex-direction: row;
+    }
+    
+    .flex-wrap {
+      flex-wrap: wrap;
+    }
+    
+    .gap-xxsmall { gap: var(--spacing-xxsmall); }
+    .gap-xsmall { gap: var(--spacing-xsmall); }
+    .gap-small { gap: var(--spacing-small); }
+    .gap-medium { gap: var(--spacing-medium); }
+    .gap-large { gap: var(--spacing-large); }
+    .gap-xlarge { gap: var(--spacing-xlarge); }
+    .gap-layout-xsmall { gap: var(--spacing-layout-xsmall); }
+    .gap-layout-medium { gap: var(--spacing-layout-medium); }
+    
+    .justify-space-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .align-center { align-items: center; }
+    .align-baseline { align-items: baseline; }
+    
+    /* Text Components */
+    .text-title {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--color-text-default);
+    }
+    
+    .text-title-large {
+      font-size: 3rem;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    
+    .text-heading {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--color-text-default);
+    }
+    
+    .text-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-subtle);
+    }
+    
+    .text-body {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--color-text-default);
+    }
+    
+    .text-body-small {
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    
+    .text-subtle {
+      color: var(--color-text-subtle);
+    }
+    
+    .text-bold {
+      font-weight: 600;
+    }
+    
+    .text-strikethrough {
+      text-decoration: line-through;
+    }
+    
+    /* Card Component */
+    .card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border-base);
+      border-radius: 8px;
+      padding: var(--spacing-layout-xsmall);
+      flex: 1;
+      min-width: 280px;
+    }
+    
+    .card-compact {
+      padding: var(--spacing-large);
+    }
+    
+    /* Badge Component */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--spacing-xsmall) var(--spacing-small);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    
+    .badge-success {
+      background: var(--color-feedback-success-light);
+      color: var(--color-feedback-success-dark);
+    }
+    
+    .badge-info {
+      background: var(--color-feedback-info-light);
+      color: var(--color-action-text-default);
+    }
+    
+    .badge-warning {
+      background: var(--color-feedback-warning-light);
+      color: var(--color-feedback-warning-base);
+    }
+    
+    .badge-error {
+      background: var(--color-feedback-error-light);
+      color: var(--color-feedback-error-base);
+    }
+    
+    .badge-neutral {
+      background: var(--color-background-light);
+      color: var(--color-text-default);
+    }
+    
+    /* Divider Component */
+    .divider {
+      height: 1px;
+      background: var(--color-border-base);
+      width: 100%;
+      margin: var(--spacing-medium) 0;
+    }
+    
+    /* Icon placeholder */
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    .icon-success { color: var(--color-feedback-success-base); }
+    .icon-info { color: var(--color-action-text-default); }
+    .icon-primary { color: var(--color-brand-primary-base); }
+    .icon-warning { color: var(--color-feedback-warning-base); }
+    
+    /* Color indicators */
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .dot-primary { background: var(--color-brand-primary-base); }
+    .dot-action { background: var(--color-action-background-subtle); }
+    .dot-subtle { background: var(--color-text-placeholder); }
+    .dot-success { background: var(--color-feedback-success-base); }
+    .dot-warning { background: var(--color-feedback-warning-base); }
+    .dot-error { background: var(--color-feedback-error-base); }
+    
+    /* Color classes */
+    .color-success { color: var(--color-feedback-success-base); }
+    .color-primary { color: var(--color-brand-primary-base); }
+    .color-warning { color: var(--color-feedback-warning-base); }
+    .color-error { color: var(--color-feedback-error-base); }
+    
+    /* Table Component */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-white);
+    }
+    
+    th {
+      text-align: left;
+      padding: var(--spacing-medium) var(--spacing-small);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-subtle);
+      border-bottom: 2px solid var(--color-border-base);
+    }
+    
+    td {
+      padding: var(--spacing-medium) var(--spacing-small);
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    tr:hover {
+      background: var(--color-background-subtle);
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--color-background-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--color-feedback-success-base);
+      transition: width 0.3s ease;
+    }
+    
+    /* Metric number styling */
+    .metric-large {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    
+    /* Header */
+    .header {
+      background: white;
+      border-bottom: 1px solid var(--color-border-base);
+      padding: var(--spacing-large) var(--spacing-layout-xsmall);
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xsmall);
+    }
+    
+    .header p {
+      color: var(--color-text-subtle);
+      font-size: 0.875rem;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--spacing-layout-xsmall);
+    }
+    
+    /* Tab-like sections */
+    .section-header {
+      margin-bottom: var(--spacing-layout-xsmall);
+      padding-bottom: var(--spacing-medium);
+      border-bottom: 2px solid var(--color-border-base);
+    }
+    
+    /* Stat grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--spacing-large);
+      padding: var(--spacing-large) 0;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    /* Chart placeholder */
+    .chart-placeholder {
+      background: var(--color-background-light);
+      border-radius: 4px;
+      padding: var(--spacing-layout-medium);
+      text-align: center;
+      color: var(--color-text-subtle);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Navigation Styles */
+    .navigation {
+      background: var(--color-brand-primary-base);
+      border-bottom: 2px solid #42247f;
+    }
+    
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-layout-xsmall);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xsmall);
+    }
+    
+    .nav-item {
+      display: inline-block;
+      padding: var(--spacing-medium) var(--spacing-large);
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .nav-item.active {
+      color: white;
+      border-bottom-color: white;
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navigation">
+    <div class="nav-container">
+      <a href="view1-configuration.html" class="nav-item">Configuration</a>
+      <a href="view2-monitoring.html" class="nav-item">Monitoring</a>
+      <a href="view3-rules-management.html" class="nav-item">Rules Management</a>
+      <a href="view4-analytics.html" class="nav-item">Analytics</a>
+      <a href="view5-product-delivery-impact-dashboard.html" class="nav-item active">Delivery Impact</a>
+      <a href="view6-workflow-analytics-dashboard.html" class="nav-item">Workflow Analytics</a>
+    </div>
+  </nav>
+  
+  <div class="header">
+    <div class="header-content">
+      <h1>Product Delivery Impact Dashboard</h1>
+      <p>Measuring the business value of design system adoption and composition intelligence</p>
+    </div>
+  </div>
+  
+  <div class="container">
+    <!-- View 1: Velocity Improvement Dashboard -->
+    <div class="flex flex-column gap-layout-medium">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Velocity Improvement</h2>
+        <p class="text-body-small text-subtle">
+          Measuring time-to-production improvements through design system + AI
+        </p>
+      </div>
+
+      <!-- Primary Metrics Row -->
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <!-- Metric Card 1: Cycle Time Reduction -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Idea-to-Production Cycle Time</span>
+              <span class="icon icon-success">⚡</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">82% faster</div>
+              <div class="flex flex-row gap-xsmall align-baseline">
+                <span class="text-body-small text-subtle text-strikethrough">3.2 days</span>
+                <span class="text-body-small">→ 4.1 hours</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↑ 15% vs last month</span>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Median time from requirement → validated implementation
+            </p>
+          </div>
+        </div>
+
+        <!-- Metric Card 2: Component Generation Velocity -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Component Generation Rate</span>
+              <span class="icon icon-primary">🚀</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">127K/day</div>
+              <span class="text-body-small text-subtle">components accepted</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-info">↑ 28% WoW</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Breakdown -->
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between align-center">
+                <div class="flex flex-row gap-xsmall align-center">
+                  <div class="dot dot-primary"></div>
+                  <span class="text-body-small">With composition intelligence</span>
+                </div>
+                <span class="text-body-small text-bold">89K (70%)</span>
+              </div>
+              
+              <div class="flex flex-row justify-space-between align-center">
+                <div class="flex flex-row gap-xsmall align-center">
+                  <div class="dot dot-action"></div>
+                  <span class="text-body-small">AI without context</span>
+                </div>
+                <span class="text-body-small">23K (18%)</span>
+              </div>
+              
+              <div class="flex flex-row justify-space-between align-center">
+                <div class="flex flex-row gap-xsmall align-center">
+                  <div class="dot dot-subtle"></div>
+                  <span class="text-body-small">Manual coding</span>
+                </div>
+                <span class="text-body-small">15K (12%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Card 3: Feature Velocity -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Features Shipped per Sprint</span>
+              <span class="icon icon-success">📦</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">3.4x</div>
+              <div class="flex flex-column gap-xsmall">
+                <span class="text-body-small text-subtle">Previous: 7.2 features</span>
+                <span class="text-body-small text-bold">Current: 24.5 features</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↑ 22% QoQ</span>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Correlation: 0.87 with DS adoption rate
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 2: Cost Efficiency Dashboard -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Cost Efficiency</h2>
+        <p class="text-body-small text-subtle">
+          Economic ROI from reduced engineering time and faster delivery
+        </p>
+      </div>
+
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <!-- Engineering Time Saved -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Engineering Hours Saved</span>
+              <span class="icon icon-primary">⏱️</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">2,847 hrs</div>
+              <span class="text-body-small text-subtle">this month</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">$427K saved</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small text-subtle">Time returned to strategic work</span>
+                <span class="text-body-small text-bold">71%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 71%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost per Feature -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Cost per Feature Delivered</span>
+              <span class="icon icon-success">💰</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">-64%</div>
+              <div class="flex flex-row gap-xsmall align-baseline">
+                <span class="text-body-small text-subtle text-strikethrough">$18,500</span>
+                <span class="text-body-small">→ $6,700</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↓ $11.8K per feature</span>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              6-month trend showing continuous improvement
+            </p>
+          </div>
+        </div>
+
+        <!-- Projected Annual Savings -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Projected Annual Savings</span>
+              <span class="icon icon-success">📊</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">$5.1M</div>
+              <span class="text-body-small text-subtle">in engineering costs</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-info">ROI: 847%</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small text-subtle">Infrastructure investment</span>
+                <span class="text-body-small">$600K</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small text-subtle">Net annual benefit</span>
+                <span class="text-body-small text-bold">$4.5M</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 3: Quality Metrics Dashboard -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Quality Metrics</h2>
+        <p class="text-body-small text-subtle">
+          Measuring composition intelligence effectiveness through validation and consistency
+        </p>
+      </div>
+
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <!-- First-time Pass Rate -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">First-Time Validation Pass Rate</span>
+              <span class="icon icon-success">✓</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">94.7%</div>
+              <span class="text-body-small text-subtle">components pass without modification</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↑ 12% from baseline</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">With composition intelligence</span>
+                <span class="text-body-small text-bold">94.7%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Without composition intelligence</span>
+                <span class="text-body-small">67.2%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Production Defect Rate -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Production Defect Rate</span>
+              <span class="icon icon-success">🛡️</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">0.8%</div>
+              <span class="text-body-small text-subtle">issues found post-deployment</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">↓ 73% vs manual</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">With composition intelligence</span>
+                <span class="text-body-small text-bold color-success">0.8%</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Manual implementation</span>
+                <span class="text-body-small color-error">3.0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Design System Consistency -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Design System Consistency Score</span>
+              <span class="icon icon-primary">🎯</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">97.2%</div>
+              <span class="text-body-small text-subtle">adherence to patterns</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-info">↑ 31% improvement</span>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Measures deviation from design system standards across all generated components
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 4: Composition Intelligence Effectiveness -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Composition Intelligence Effectiveness</h2>
+        <p class="text-body-small text-subtle">
+          Direct measurement of context quality and pattern recognition accuracy
+        </p>
+      </div>
+
+      <div class="flex flex-row gap-layout-xsmall flex-wrap">
+        
+        <!-- Pattern Match Rate -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Pattern Match Rate</span>
+              <span class="icon icon-primary">🔍</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">91.3%</div>
+              <span class="text-body-small text-subtle">correct pattern identification</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-info">↑ 18% from Q1</span>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              Percentage of generations that correctly identified and applied existing composition patterns
+            </p>
+          </div>
+        </div>
+
+        <!-- Validation Rules Triggered -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Proactive Issue Prevention</span>
+              <span class="icon icon-success">🚨</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-success">8,942</div>
+              <span class="text-body-small text-subtle">issues caught pre-review</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-success">87% before code review</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex flex-column gap-small">
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Accessibility violations</span>
+                <span class="text-body-small">3,274</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Pattern misuse</span>
+                <span class="text-body-small">2,891</span>
+              </div>
+              <div class="flex flex-row justify-space-between">
+                <span class="text-body-small">Token violations</span>
+                <span class="text-body-small">2,777</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Context Utilization -->
+        <div class="card">
+          <div class="flex flex-column gap-medium">
+            <div class="flex flex-row justify-space-between align-center">
+              <span class="text-label">Context Utilization Score</span>
+              <span class="icon icon-primary">📚</span>
+            </div>
+            
+            <div class="flex flex-column gap-xxsmall">
+              <div class="metric-large color-primary">83.6%</div>
+              <span class="text-body-small text-subtle">relevant context applied</span>
+            </div>
+            
+            <div class="flex flex-row gap-xsmall align-center">
+              <span class="badge badge-info">Optimal range</span>
+            </div>
+            
+            <div class="divider"></div>
+            <p class="text-body-small text-subtle">
+              How much of available design system context was relevant to successful generations
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 5: Detailed Performance Table -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Component Generation Performance</h2>
+        <p class="text-body-small text-subtle">
+          Detailed breakdown of throughput and quality by generation method
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Generation Method</th>
+                <th>Daily Volume</th>
+                <th>Pass Rate</th>
+                <th>Avg Time</th>
+                <th>Cost/Component</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="flex flex-row gap-xsmall align-center">
+                    <div class="dot dot-primary"></div>
+                    <span class="text-bold">With Composition Intelligence</span>
+                  </div>
+                </td>
+                <td><strong>89,234</strong></td>
+                <td>
+                  <span class="badge badge-success">94.7%</span>
+                </td>
+                <td>14 min</td>
+                <td>$0.23</td>
+                <td>
+                  <span class="badge badge-success">↑ 28%</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="flex flex-row gap-xsmall align-center">
+                    <div class="dot dot-action"></div>
+                    <span>AI without Context</span>
+                  </div>
+                </td>
+                <td>23,104</td>
+                <td>
+                  <span class="badge badge-warning">67.2%</span>
+                </td>
+                <td>38 min</td>
+                <td>$0.71</td>
+                <td>
+                  <span class="badge badge-neutral">→ 0%</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="flex flex-row gap-xsmall align-center">
+                    <div class="dot dot-subtle"></div>
+                    <span>Manual Coding</span>
+                  </div>
+                </td>
+                <td>14,892</td>
+                <td>
+                  <span class="badge badge-warning">71.5%</span>
+                </td>
+                <td>4.2 hrs</td>
+                <td>$12.50</td>
+                <td>
+                  <span class="badge badge-error">↓ 42%</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stat Grid -->
+    <div class="flex flex-column gap-layout-medium" style="margin-top: var(--spacing-layout-large);">
+      
+      <div class="flex flex-column gap-small">
+        <h2 class="text-heading">Key Performance Indicators</h2>
+        <p class="text-body-small text-subtle">
+          Overall system impact across all metrics
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="metric-large color-success">127K</div>
+            <div class="text-body-small text-subtle">Components/Day</div>
+          </div>
+          <div class="stat-item">
+            <div class="metric-large color-success">82%</div>
+            <div class="text-body-small text-subtle">Faster Delivery</div>
+          </div>
+          <div class="stat-item">
+            <div class="metric-large color-primary">94.7%</div>
+            <div class="text-body-small text-subtle">Pass Rate</div>
+          </div>
+          <div class="stat-item">
+            <div class="metric-large color-success">$5.1M</div>
+            <div class="text-body-small text-subtle">Annual Savings</div>
+          </div>
+          <div class="stat-item">
+            <div class="metric-large color-primary">3.4x</div>
+            <div class="text-body-small text-subtle">Feature Velocity</div>
+          </div>
+          <div class="stat-item">
+            <div class="metric-large color-success">0.8%</div>
+            <div class="text-body-small text-subtle">Defect Rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="flex flex-column gap-small" style="margin-top: var(--spacing-layout-large); padding-top: var(--spacing-layout-xsmall); border-top: 1px solid var(--color-border-base);">
+      <p class="text-body-small text-subtle">
+        <strong>Note:</strong> All metrics are based on production telemetry from the Intelligent Product Engine. 
+        Data represents trailing 30-day averages with week-over-week (WoW) and quarter-over-quarter (QoQ) trend indicators.
+      </p>
+      <p class="text-body-small text-subtle">
+        Built with the <strong>Toby Design System</strong> - demonstrating composition intelligence in practice.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

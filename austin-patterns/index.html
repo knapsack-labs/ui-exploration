@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playback: Meaningful AI Integration in Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            line-height: 1.5;
+            color: #28262c;
+            background: #faf9fa;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem 3rem;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6436bf;
+            background: #f3effb;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+            color: #28262c;
+        }
+
+        .intro {
+            font-size: 1.125rem;
+            line-height: 1.5;
+            color: #645e6e;
+        }
+
+        /* Summary Section */
+        .summary {
+            background: white;
+            border: 1px solid #e0dee3;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0px 0px 0px 1px rgba(20, 19, 22, 0.04), 2px 2px 4px rgba(20, 19, 22, 0.08);
+        }
+
+        .summary h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #645e6e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .summary p {
+            font-size: 1.125rem;
+            line-height: 1.5;
+            color: #28262c;
+        }
+
+        /* Key Points */
+        .key-points {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .point-card {
+            background: white;
+            border: 1px solid #e0dee3;
+            border-left: 4px solid #6436bf;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 300ms cubic-bezier(0.7, 0.4, 0.2, 1);
+        }
+
+        .point-card:hover {
+            box-shadow: 0px 0px 0px 1px rgba(20, 19, 22, 0.04), 2px 2px 4px rgba(20, 19, 22, 0.08);
+            border-left-color: #e43a5c;
+        }
+
+        .point-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: #f3effb;
+            color: #6436bf;
+            font-weight: 700;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .point-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+            color: #28262c;
+        }
+
+        .point-card p {
+            line-height: 1.5;
+            color: #645e6e;
+        }
+
+        /* Footer Section */
+        .conclusion {
+            background: linear-gradient(135deg, #6436bf 0%, #42247f 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .conclusion h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .conclusion p {
+            font-size: 1.125rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.95);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            color: #a19cab;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .intro {
+                font-size: 1rem;
+            }
+
+            .summary {
+                padding: 1.5rem;
+            }
+
+            .summary p {
+                font-size: 1rem;
+            }
+
+            .point-card {
+                padding: 1.25rem;
+            }
+
+            .conclusion {
+                padding: 2rem 1.5rem;
+            }
+
+            .conclusion h2 {
+                font-size: 1.25rem;
+            }
+
+            .conclusion p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .point-card h3 {
+                font-size: 1.125rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="page-header">
+            <span class="label">Playback</span>
+            <h1>Meaningful AI integration in workflow</h1>
+            <p class="intro">Our discussion centered on what meaningful AI integration actually looks like—beyond just automating steps—and how it could reshape the way we work day-to-day.</p>
+        </div>
+
+        <div class="summary">
+            <h2>In short</h2>
+            <p>A meaningful AI integration doesn't just automate tasks; it amplifies intention. It reduces cognitive load, connects fragmented stages, and gives us back the mental space to design with purpose.</p>
+        </div>
+
+        <div class="key-points">
+            <article class="point-card">
+                <div class="point-number">1</div>
+                <h3>Meaningful = trust + transparency</h3>
+                <p>We agreed that integration is only meaningful if it feels trustworthy. That means understanding what the AI is doing, why it made certain decisions, and being able to adjust or override it. Without transparency, time saved could quickly turn into time spent second-guessing.</p>
+            </article>
+
+            <article class="point-card">
+                <div class="point-number">2</div>
+                <h3>Partnership, not replacement</h3>
+                <p>AI should act as a co-pilot—augmenting human decision-making, not replacing it. The best integrations anticipate needs, surface insights, and take on repetitive or procedural work so that designers and developers can stay focused on creative, strategic problem-solving.</p>
+            </article>
+
+            <article class="point-card">
+                <div class="point-number">3</div>
+                <h3>Seamless workflow, fewer hand-offs</h3>
+                <p>We mapped out how AI could connect traditionally disjointed stages—research, design, QA, documentation, and delivery—into a single, continuous workflow. For example, automatically generating design specs, writing initial test scripts, or summarizing research findings could dramatically cut hand-off friction.</p>
+            </article>
+
+            <article class="point-card">
+                <div class="point-number">4</div>
+                <h3>Time saved = time reinvested</h3>
+                <p>The time we'd gain isn't about working faster—it's about working better. We'd use that reclaimed time for deeper exploration: validating ideas with real users, improving craft quality, mentoring, or simply stepping back to think more holistically about the product experience.</p>
+            </article>
+
+            <article class="point-card">
+                <div class="point-number">5</div>
+                <h3>Guardrails and iteration loops</h3>
+                <p>AI needs clear boundaries and feedback loops. A "meaningful integration" should learn from context—the team's tone, brand, accessibility standards—and continuously improve from our input. That keeps it from feeling generic or disconnected from our shared standards.</p>
+            </article>
+        </div>
+
+        <div class="conclusion">
+            <h2>The bottom line</h2>
+            <p>AI integration becomes meaningful when it amplifies intention, reduces cognitive load, and creates space for purposeful design work.</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>Last updated: November 6, 2025</p>
+    </footer>
+</body>
+</html>

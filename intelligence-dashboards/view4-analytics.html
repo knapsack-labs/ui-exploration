@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics: Usage & Compliance - Product Context Intelligence</title>
+    <style>
+        /* Toby Design Tokens */
+        :root {
+            --color-brand-primary: #6436bf;
+            --color-brand-primary-dark: #42247f;
+            --color-brand-primary-light: #f3effb;
+            --color-text-default: #28262c;
+            --color-text-subtle: #645e6e;
+            --color-background-light: #f5f4f6;
+            --color-background-subtle: #faf9fa;
+            --color-border-base: #e0dee3;
+            --color-border-dark: #cbc8d0;
+            --color-action-text: #05a2f0;
+            --color-feedback-success: #36bf7f;
+            --color-feedback-success-light: #effbf5;
+            --color-feedback-warning: #eb8d0a;
+            --color-feedback-warning-light: #fef6eb;
+            --color-feedback-error: #e60f0f;
+            --color-feedback-error-light: #feecec;
+            
+            --spacing-xxsmall: 0.125rem;
+            --spacing-xsmall: 0.25rem;
+            --spacing-small: 0.5rem;
+            --spacing-medium: 0.75rem;
+            --spacing-large: 1rem;
+            --spacing-xlarge: 1.5rem;
+            --spacing-layout-xsmall: 2rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--color-text-default);
+            background: var(--color-background-subtle);
+            line-height: 1.5;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--color-border-base);
+            padding: var(--spacing-large) var(--spacing-layout-xsmall);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .header p {
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-layout-xsmall);
+        }
+        
+        .section {
+            background: white;
+            border: 1px solid var(--color-border-base);
+            border-radius: 8px;
+            margin-bottom: var(--spacing-xlarge);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: var(--color-background-light);
+            padding: var(--spacing-large);
+            border-bottom: 1px solid var(--color-border-base);
+        }
+        
+        .section-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .section-header p {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .section-content {
+            padding: var(--spacing-large);
+        }
+        
+        .overall-health {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xlarge);
+            margin-bottom: var(--spacing-xlarge);
+            padding: var(--spacing-xlarge);
+            background: var(--color-background-light);
+            border-radius: 8px;
+        }
+        
+        .health-score {
+            font-size: 4rem;
+            font-weight: 600;
+            color: var(--color-feedback-warning);
+        }
+        
+        .health-details {
+            flex: 1;
+        }
+        
+        .health-label {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .health-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .health-trend {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-small);
+            font-size: 0.875rem;
+        }
+        
+        .trend-down {
+            color: var(--color-feedback-error);
+        }
+        
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-large);
+            margin-bottom: var(--spacing-xlarge);
+        }
+        
+        .compliance-card {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+        }
+        
+        .compliance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .compliance-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .compliance-score {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .score-excellent {
+            color: var(--color-feedback-success);
+        }
+        
+        .score-good {
+            color: var(--color-brand-primary);
+        }
+        
+        .score-warning {
+            color: var(--color-feedback-warning);
+        }
+        
+        .score-poor {
+            color: var(--color-feedback-error);
+        }
+        
+        .compliance-bar {
+            height: 8px;
+            background: var(--color-background-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .compliance-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .compliance-details {
+            font-size: 0.75rem;
+            color: var(--color-text-subtle);
+            line-height: 1.6;
+        }
+        
+        .trend {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xxsmall);
+            padding: var(--spacing-xxsmall) var(--spacing-small);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: var(--spacing-small);
+        }
+        
+        .trend-up {
+            background: var(--color-feedback-success-light);
+            color: var(--color-feedback-success);
+        }
+        
+        .trend-stable {
+            background: var(--color-background-light);
+            color: var(--color-text-subtle);
+        }
+        
+        .trend-down {
+            background: var(--color-feedback-error-light);
+            color: var(--color-feedback-error);
+        }
+        
+        .team-card {
+            padding: var(--spacing-large);
+            border: 1px solid var(--color-border-base);
+            border-radius: 6px;
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .team-info {
+            flex: 1;
+        }
+        
+        .team-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-xsmall);
+        }
+        
+        .team-meta {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+        }
+        
+        .team-score {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        
+        .team-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--spacing-medium);
+            margin-bottom: var(--spacing-medium);
+            font-size: 0.875rem;
+        }
+        
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xxsmall);
+        }
+        
+        .metric-label {
+            color: var(--color-text-subtle);
+            font-size: 0.75rem;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+        }
+        
+        .team-notes {
+            padding: var(--spacing-medium);
+            background: var(--color-background-light);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            margin-top: var(--spacing-medium);
+        }
+        
+        .note-section {
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .note-label {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xxsmall);
+        }
+        
+        .comparison-card {
+            padding: var(--spacing-large);
+            border: 2px solid var(--color-brand-primary);
+            border-radius: 6px;
+            background: var(--color-brand-primary-light);
+        }
+        
+        .comparison-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-large);
+            color: var(--color-brand-primary-dark);
+        }
+        
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 200px repeat(3, 1fr);
+            gap: var(--spacing-medium);
+            padding: var(--spacing-small) 0;
+            border-bottom: 1px solid var(--color-border-base);
+            font-size: 0.875rem;
+        }
+        
+        .comparison-row:first-of-type {
+            font-weight: 600;
+            background: white;
+            padding: var(--spacing-small);
+            border-radius: 4px;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+        
+        .insight-box {
+            margin-top: var(--spacing-large);
+            padding: var(--spacing-large);
+            background: white;
+            border-radius: 6px;
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .insight-text {
+            font-size: 0.875rem;
+            color: var(--color-text-subtle);
+            line-height: 1.6;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: var(--spacing-small) var(--spacing-large);
+            background: white;
+            border: 1px solid var(--color-border-dark);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-default);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .button:hover {
+            border-color: var(--color-brand-primary);
+            color: var(--color-brand-primary);
+        }
+        
+        .button-primary {
+            background: var(--color-brand-primary);
+            border-color: var(--color-brand-primary);
+            color: white;
+        }
+        
+        .button-primary:hover {
+            background: var(--color-brand-primary-dark);
+            border-color: var(--color-brand-primary-dark);
+            color: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--spacing-small);
+            margin-top: var(--spacing-large);
+        }
+        
+        .alert-box {
+            padding: var(--spacing-large);
+            background: var(--color-feedback-warning-light);
+            border-left: 4px solid var(--color-feedback-warning);
+            border-radius: 4px;
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            color: var(--color-feedback-warning);
+            margin-bottom: var(--spacing-small);
+        }
+        
+        .alert-text {
+            font-size: 0.875rem;
+            color: var(--color-text-default);
+        }
+        
+        /* Navigation Styles */
+        .navigation {
+            background: var(--color-brand-primary);
+            border-bottom: 2px solid var(--color-brand-primary-dark);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-layout-xsmall);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xsmall);
+        }
+        
+        .nav-item {
+            display: inline-block;
+            padding: var(--spacing-medium) var(--spacing-large);
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            color: white;
+            border-bottom-color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <div class="nav-container">
+            <a href="view1-configuration.html" class="nav-item">Configuration</a>
+            <a href="view2-monitoring.html" class="nav-item">Monitoring</a>
+            <a href="view3-rules-management.html" class="nav-item">Rules Management</a>
+            <a href="view4-analytics.html" class="nav-item active">Analytics</a>
+            <a href="view5-product-delivery-impact-dashboard.html" class="nav-item">Delivery Impact</a>
+            <a href="view6-workflow-analytics-dashboard.html" class="nav-item">Workflow Analytics</a>
+        </div>
+    </nav>
+    
+    <div class="header">
+        <div class="header-content">
+            <h1>Analytics: Usage & compliance</h1>
+            <p>Understand how product context is being used across the organization</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Overall Compliance -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Compliance overview</h2>
+                <p>Last 30 days</p>
+            </div>
+            <div class="section-content">
+                <div class="overall-health">
+                    <div class="health-score">81%</div>
+                    <div class="health-details">
+                        <div class="health-label">Overall system health</div>
+                        <div class="health-title">Compliant</div>
+                        <div class="health-trend">
+                            <span class="trend-down">↓ -4%</span>
+                            <span>New ADA requirements added this month</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="compliance-grid">
+                    <div class="compliance-card">
+                        <div class="compliance-header">
+                            <div class="compliance-name">Visual design</div>
+                            <div class="compliance-score score-excellent">96%</div>
+                        </div>
+                        <div class="compliance-bar">
+                            <div class="compliance-fill" style="width: 96%; background: var(--color-feedback-success);"></div>
+                        </div>
+                        <div class="compliance-details">
+                            Component usage: 98%<br>
+                            Token adherence: 94%<br>
+                            Layout patterns: 96%
+                        </div>
+                        <div class="trend trend-stable">→ Stable</div>
+                    </div>
+                    
+                    <div class="compliance-card">
+                        <div class="compliance-header">
+                            <div class="compliance-name">Brand & communications</div>
+                            <div class="compliance-score score-good">89%</div>
+                        </div>
+                        <div class="compliance-bar">
+                            <div class="compliance-fill" style="width: 89%; background: var(--color-brand-primary);"></div>
+                        </div>
+                        <div class="compliance-details">
+                            Plain language: 91%<br>
+                            Approved terminology: 88%<br>
+                            Multilingual support: 87%
+                        </div>
+                        <div class="trend trend-up">↑ +3%</div>
+                    </div>
+                    
+                    <div class="compliance-card">
+                        <div class="compliance-header">
+                            <div class="compliance-name">Accessibility</div>
+                            <div class="compliance-score score-warning">74%</div>
+                        </div>
+                        <div class="compliance-bar">
+                            <div class="compliance-fill" style="width: 74%; background: var(--color-feedback-warning);"></div>
+                        </div>
+                        <div class="compliance-details">
+                            WCAG AA baseline: 82%<br>
+                            ADA Title II: 71%<br>
+                            Multilingual a11y: 68%
+                        </div>
+                        <div class="trend trend-down">↓ -9%</div>
+                    </div>
+                    
+                    <div class="compliance-card">
+                        <div class="compliance-header">
+                            <div class="compliance-name">Regulatory & legal</div>
+                            <div class="compliance-score score-good">85%</div>
+                        </div>
+                        <div class="compliance-bar">
+                            <div class="compliance-fill" style="width: 85%; background: var(--color-brand-primary);"></div>
+                        </div>
+                        <div class="compliance-details">
+                            State DMV regulations: 92%<br>
+                            Federal REAL ID: 89%<br>
+                            Privacy Act: 78%
+                        </div>
+                        <div class="trend trend-stable">→ Stable</div>
+                    </div>
+                    
+                    <div class="compliance-card">
+                        <div class="compliance-header">
+                            <div class="compliance-name">Security & data</div>
+                            <div class="compliance-score score-excellent">94%</div>
+                        </div>
+                        <div class="compliance-bar">
+                            <div class="compliance-fill" style="width: 94%; background: var(--color-feedback-success);"></div>
+                        </div>
+                        <div class="compliance-details">
+                            PII handling: 97%<br>
+                            Data encryption: 98%<br>
+                            Access controls: 89%
+                        </div>
+                        <div class="trend trend-up">↑ +2%</div>
+                    </div>
+                    
+                    <div class="compliance-card">
+                        <div class="compliance-header">
+                            <div class="compliance-name">Performance</div>
+                            <div class="compliance-score score-poor">68%</div>
+                        </div>
+                        <div class="compliance-bar">
+                            <div class="compliance-fill" style="width: 68%; background: var(--color-feedback-error);"></div>
+                        </div>
+                        <div class="compliance-details">
+                            Page load times: 72%<br>
+                            Form submission: 81%<br>
+                            Mobile performance: 51%
+                        </div>
+                        <div class="trend trend-down">↓ -12%</div>
+                    </div>
+                </div>
+                
+                <div class="alert-box">
+                    <div class="alert-title">⚠ Critical: Mobile performance</div>
+                    <div class="alert-text">Mobile is 47% of traffic but only 51% compliant. Many residents cannot complete forms on mobile.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Compliance by Team -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Compliance by team / service area</h2>
+                <p>Team-level breakdown with accountability</p>
+            </div>
+            <div class="section-content">
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-info">
+                            <div class="team-name">Driver services</div>
+                            <div class="team-meta">Internal team • 12 developers</div>
+                        </div>
+                        <div class="team-score score-good">89%</div>
+                    </div>
+                    
+                    <div class="team-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Visual</span>
+                            <span class="metric-value">97%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Brand</span>
+                            <span class="metric-value">92%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">A11y</span>
+                            <span class="metric-value">84%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Regulatory</span>
+                            <span class="metric-value">93%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Security</span>
+                            <span class="metric-value">96%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance</span>
+                            <span class="metric-value">76%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="team-notes">
+                        <div class="note-section">
+                            <div class="note-label">Strengths:</div>
+                            Strong regulatory compliance, good security
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label">Needs improvement:</div>
+                            Performance (mobile forms slow)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-info">
+                            <div class="team-name">Vendor portal</div>
+                            <div class="team-meta">External contractor • VendorTech</div>
+                        </div>
+                        <div class="team-score score-poor">63%</div>
+                    </div>
+                    
+                    <div class="team-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Visual</span>
+                            <span class="metric-value">88%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Brand</span>
+                            <span class="metric-value">74%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">A11y</span>
+                            <span class="metric-value">52%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Regulatory</span>
+                            <span class="metric-value">67%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Security</span>
+                            <span class="metric-value">71%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance</span>
+                            <span class="metric-value">48%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="team-notes" style="background: var(--color-feedback-error-light);">
+                        <div class="note-section">
+                            <div class="note-label">⚠ Critical issues:</div>
+                            • Accessibility: Many forms fail screen reader test<br>
+                            • Regulatory: Missing REAL ID compliance checks<br>
+                            • Performance: Load times exceed 10 seconds on mobile
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label">Status:</div>
+                            Contract renewal review in progress
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label">Recommendation:</div>
+                            Require compliance improvement plan
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-info">
+                            <div class="team-name">Field offices</div>
+                            <div class="team-meta">Non-technical staff using form builder</div>
+                        </div>
+                        <div class="team-score score-warning">72%</div>
+                    </div>
+                    
+                    <div class="team-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Visual</span>
+                            <span class="metric-value">91%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Brand</span>
+                            <span class="metric-value">81%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">A11y</span>
+                            <span class="metric-value">61%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Regulatory</span>
+                            <span class="metric-value">79%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Security</span>
+                            <span class="metric-value">82%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Performance</span>
+                            <span class="metric-value">64%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="team-notes">
+                        <div class="note-section">
+                            <div class="note-label">Context:</div>
+                            Field staff use AI form builder to create custom forms for local needs
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label">Issue:</div>
+                            AI-generated forms have lower compliance than developer-built forms (72% vs 88%)
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label">Plan:</div>
+                            Additional AI guardrails, better templates, training
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI vs Human Comparison -->
+        <div class="section">
+            <div class="section-header">
+                <h2>AI-generated vs human-built forms</h2>
+                <p>Comparison by development approach</p>
+            </div>
+            <div class="section-content">
+                <div class="comparison-card">
+                    <div class="comparison-title">Breakdown by constraint type</div>
+                    
+                    <div class="comparison-row">
+                        <div>Constraint type</div>
+                        <div>Developer-built</div>
+                        <div>Human + AI</div>
+                        <div>Pure AI</div>
+                    </div>
+                    
+                    <div class="comparison-row">
+                        <div>Visual design</div>
+                        <div>97%</div>
+                        <div>91%</div>
+                        <div>88%</div>
+                    </div>
+                    
+                    <div class="comparison-row">
+                        <div>Brand / plain language</div>
+                        <div>92%</div>
+                        <div>81%</div>
+                        <div>74%</div>
+                    </div>
+                    
+                    <div class="comparison-row">
+                        <div>Accessibility</div>
+                        <div>84%</div>
+                        <div>61%</div>
+                        <div style="color: var(--color-feedback-error); font-weight: 600;">52%</div>
+                    </div>
+                    
+                    <div class="comparison-row">
+                        <div>Regulatory</div>
+                        <div>93%</div>
+                        <div>79%</div>
+                        <div style="color: var(--color-feedback-error); font-weight: 600;">67%</div>
+                    </div>
+                    
+                    <div class="comparison-row">
+                        <div>Security</div>
+                        <div>96%</div>
+                        <div>82%</div>
+                        <div>71%</div>
+                    </div>
+                    
+                    <div class="comparison-row">
+                        <div>Performance</div>
+                        <div>76%</div>
+                        <div>64%</div>
+                        <div style="color: var(--color-feedback-error); font-weight: 600;">48%</div>
+                    </div>
+                    
+                    <div class="insight-box">
+                        <div class="insight-title">Key insight: AI is fast but needs better guardrails</div>
+                        <div class="insight-text">
+                            • AI can reduce development time by 90% (16hrs → 2hrs → 30min)<br>
+                            • But compliance drops significantly without guidance<br>
+                            • Solution: Strengthen AI validation rules, better templates, require approval for forms touching sensitive data
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="button-primary">View AI performance details</button>
+                    <button class="button">Update AI guardrails</button>
+                    <button class="button">Download report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
