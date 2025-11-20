@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knapsack - Intelligent Product Engine Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .demo-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Left Sidebar - IPE Interface */
+        .ipe-sidebar {
+            width: 400px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .input-section {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .input-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #334155;
+        }
+        
+        .prompt-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+        
+        .prompt-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: opacity 0.2s ease;
+        }
+        
+        .generate-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Component Tree */
+        .component-tree {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        .tree-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #334155;
+        }
+        
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .tree-item:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .tree-item.selected {
+            background-color: #e0e7ff;
+            border-color: #667eea;
+        }
+        
+        .tree-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .tree-item.container {
+            margin-left: 0;
+        }
+        
+        .tree-item.component {
+            margin-left: 20px;
+        }
+        
+        /* Main Canvas */
+        .main-canvas {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-header {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .canvas-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .canvas-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
+        .action-btn.primary {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .action-btn.primary:hover {
+            background: #5a67d8;
+        }
+        
+        /* Live Preview */
+        .live-preview {
+            flex: 1;
+            padding: 24px;
+            background: #f1f5f9;
+            overflow: auto;
+        }
+        
+        .preview-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+            position: relative;
+        }
+        
+        /* Generated Product UI */
+        .product-ui {
+            padding: 0;
+            min-height: 600px;
+        }
+        
+        .product-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .product-header:hover {
+            transform: scale(1.02);
+        }
+        
+        .product-header.selected {
+            outline: 3px solid #667eea;
+            outline-offset: -3px;
+        }
+        
+        .product-header h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        
+        .product-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-button {
+            background: white;
+            color: #4facfe;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        
+        .features-section {
+            padding: 80px 40px;
+            background: white;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .features-section:hover {
+            background-color: #fafbfc;
+        }
+        
+        .features-section.selected {
+            outline: 3px solid #667eea;
+            outline-offset: -3px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 32px 24px;
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: transform 0.2s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 24px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #334155;
+        }
+        
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        .footer-section {
+            background: #1e293b;
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .footer-section:hover {
+            background-color: #334155;
+        }
+        
+        .footer-section.selected {
+            outline: 3px solid #667eea;
+            outline-offset: -3px;
+        }
+        
+        /* Right Panel - Properties */
+        .properties-panel {
+            width: 320px;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        
+        .panel-header h3 {
+            font-size: 1.1rem;
+            color: #334155;
+        }
+        
+        .properties-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .property-group {
+            margin-bottom: 24px;
+        }
+        
+        .property-group h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .property-item {
+            margin-bottom: 16px;
+        }
+        
+        .property-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-bottom: 6px;
+        }
+        
+        .property-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .property-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .color-input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .ai-suggestions {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        
+        .ai-suggestions h4 {
+            font-size: 0.9rem;
+            color: #0c4a6e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-item {
+            background: white;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+        
+        .suggestion-item:hover {
+            background: #e0f2fe;
+            border-color: #0ea5e9;
+        }
+        
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            flex-direction: column;
+            color: #64748b;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            flex-direction: column;
+            color: #64748b;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Internal Usage Banner -->
+    <div style="background: #dc2626; color: white; text-align: center; padding: 15px 0; font-weight: 600; font-size: 14px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        For Knapsack internal usage only
+    </div>
+    
+    <div class="demo-container" style="margin-top: 50px;">
+        <!-- Left Sidebar - IPE Interface -->
+        <div class="ipe-sidebar">
+            <div class="sidebar-header">
+                <h2>Intelligent Product Engine</h2>
+                <p>Prompt → Working Product v1.0</p>
+            </div>
+            
+            <div class="input-section">
+                <h3>Describe Your Product</h3>
+                <textarea class="prompt-input" id="product-prompt" placeholder="Describe the product you want to build...
+
+Example: 'Build a SaaS landing page for an AI-powered analytics platform. Include a hero section with compelling headline, feature showcase highlighting real-time insights and predictive analytics, and a footer with contact info. Use modern, professional design with blue accent colors.'">Build a SaaS landing page for an AI-powered analytics platform. Include a hero section with compelling headline, feature showcase highlighting real-time insights and predictive analytics, and a footer with contact info. Use modern, professional design with blue accent colors.</textarea>
+                <button class="generate-btn" onclick="generateProduct()">Generate Product v1.0</button>
+            </div>
+            
+            <div class="component-tree">
+                <div class="tree-header">Generated Structure</div>
+                <div id="component-tree-content">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏗️</div>
+                        <p>Generate a product to see its structure</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Canvas -->
+        <div class="main-canvas">
+            <div class="canvas-header">
+                <div class="canvas-title">Live Product Preview</div>
+                <div class="canvas-actions">
+                    <button class="action-btn" onclick="toggleCode()">View Code</button>
+                    <button class="action-btn" onclick="exportProduct()">Export</button>
+                    <button class="action-btn primary" onclick="deployProduct()">Deploy</button>
+                </div>
+            </div>
+            
+            <div class="live-preview">
+                <div class="preview-container">
+                    <div id="product-preview">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">✨</div>
+                            <h3>Ready to generate your product</h3>
+                            <p>Describe what you want to build in the sidebar to get started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel - Properties -->
+        <div class="properties-panel">
+            <div class="panel-header">
+                <h3>Properties & AI Suggestions</h3>
+            </div>
+            
+            <div class="properties-content" id="properties-content">
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚙️</div>
+                    <p>Select a component to edit its properties</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedComponent = null;
+        let generatedProduct = null;
+        
+        function generateProduct() {
+            const prompt = document.getElementById('product-prompt').value;
+            const generateBtn = document.querySelector('.generate-btn');
+            const previewContainer = document.getElementById('product-preview');
+            const treeContent = document.getElementById('component-tree-content');
+            
+            // Show loading state
+            generateBtn.textContent = 'Generating...';
+            generateBtn.disabled = true;
+            
+            previewContainer.innerHTML = `
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Intelligent Product Engine is analyzing your requirements...</p>
+                    <small>• Inferring design system patterns<br>• Querying MCP for best practices<br>• Composing production-ready components</small>
+                </div>
+            `;
+            
+            // Simulate generation process
+            setTimeout(() => {
+                // Generate the actual product
+                previewContainer.innerHTML = `
+                    <div class="product-ui">
+                        <div class="product-header selected" onclick="selectComponent('hero', this)">
+                            <h1>Unlock Insights with AI Analytics</h1>
+                            <p>Transform your data into actionable intelligence with our advanced AI platform. Make smarter decisions faster than ever before.</p>
+                            <button class="cta-button">Start Free Trial</button>
+                        </div>
+                        
+                        <div class="features-section" onclick="selectComponent('features', this)">
+                            <div class="features-grid">
+                                <div class="feature-card">
+                                    <div class="feature-icon">📊</div>
+                                    <h3>Real-time Insights</h3>
+                                    <p>Get instant visibility into your data with live dashboards and automated reporting.</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">🤖</div>
+                                    <h3>Predictive Analytics</h3>
+                                    <p>Leverage machine learning to forecast trends and identify opportunities before they happen.</p>
+                                </div>
+                                <div class="feature-card">
+                                    <div class="feature-icon">⚡</div>
+                                    <h3>Lightning Fast</h3>
+                                    <p>Process millions of data points in seconds with our optimized analytics engine.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="footer-section" onclick="selectComponent('footer', this)">
+                            <h3>Ready to get started?</h3>
+                            <p>Contact us: hello@aianalytics.com | (555) 123-4567</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Update component tree
+                treeContent.innerHTML = `
+                    <div class="tree-item container selected" onclick="selectTreeItem(this, 'hero')">
+                        <div class="tree-icon">🏠</div>
+                        <span>Hero Section</span>
+                    </div>
+                    <div class="tree-item component" onclick="selectTreeItem(this, 'hero-title')">
+                        <div class="tree-icon">📝</div>
+                        <span>Main Headline</span>
+                    </div>
+                    <div class="tree-item component" onclick="selectTreeItem(this, 'hero-subtitle')">
+                        <div class="tree-icon">📄</div>
+                        <span>Subtitle</span>
+                    </div>
+                    <div class="tree-item component" onclick="selectTreeItem(this, 'hero-cta')">
+                        <div class="tree-icon">🎯</div>
+                        <span>CTA Button</span>
+                    </div>
+                    <div class="tree-item container" onclick="selectTreeItem(this, 'features')">
+                        <div class="tree-icon">⭐</div>
+                        <span>Features Section</span>
+                    </div>
+                    <div class="tree-item component" onclick="selectTreeItem(this, 'feature-1')">
+                        <div class="tree-icon">📊</div>
+                        <span>Real-time Insights</span>
+                    </div>
+                    <div class="tree-item component" onclick="selectTreeItem(this, 'feature-2')">
+                        <div class="tree-icon">🤖</div>
+                        <span>Predictive Analytics</span>
+                    </div>
+                    <div class="tree-item component" onclick="selectTreeItem(this, 'feature-3')">
+                        <div class="tree-icon">⚡</div>
+                        <span>Lightning Fast</span>
+                    </div>
+                    <div class="tree-item container" onclick="selectTreeItem(this, 'footer')">
+                        <div class="tree-icon">🔗</div>
+                        <span>Footer</span>
+                    </div>
+                `;
+                
+                generateBtn.textContent = 'Generate Product v1.0';
+                generateBtn.disabled = false;
+                
+                // Auto-select hero section
+                selectComponent('hero', document.querySelector('.product-header'));
+                
+            }, 3000);
+        }
+        
+        function selectComponent(type, element) {
+            // Remove previous selections
+            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            
+            // Select current element
+            element.classList.add('selected');
+            selectedComponent = type;
+            
+            // Update properties panel
+            updatePropertiesPanel(type);
+        }
+        
+        function selectTreeItem(element, type) {
+            // Remove previous selections
+            document.querySelectorAll('.tree-item.selected').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            // Find and highlight the corresponding component
+            const componentMap = {
+                'hero': '.product-header',
+                'features': '.features-section',
+                'footer': '.footer-section'
+            };
+            
+            if (componentMap[type]) {
+                const targetElement = document.querySelector(componentMap[type]);
+                if (targetElement) {
+                    selectComponent(type, targetElement);
+                }
+            }
+        }
+        
+        function updatePropertiesPanel(type) {
+            const propertiesContent = document.getElementById('properties-content');
+            
+            const propertyPanels = {
+                'hero': `
+                    <div class="property-group">
+                        <h4>Content</h4>
+                        <div class="property-item">
+                            <label class="property-label">Headline</label>
+                            <input type="text" class="property-input" value="Unlock Insights with AI Analytics" onchange="updateContent(this.value, 'h1')">
+                        </div>
+                        <div class="property-item">
+                            <label class="property-label">Subheading</label>
+                            <textarea class="property-input" rows="3" onchange="updateContent(this.value, 'p')">Transform your data into actionable intelligence with our advanced AI platform. Make smarter decisions faster than ever before.</textarea>
+                        </div>
+                        <div class="property-item">
+                            <label class="property-label">Button Text</label>
+                            <input type="text" class="property-input" value="Start Free Trial" onchange="updateButtonText(this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <h4>Styling</h4>
+                        <div class="property-item">
+                            <label class="property-label">Background</label>
+                            <input type="color" class="color-input" value="#4facfe" onchange="updateHeroBackground(this.value)">
+                        </div>
+                        <div class="property-item">
+                            <label class="property-label">Text Color</label>
+                            <input type="color" class="color-input" value="#ffffff">
+                        </div>
+                    </div>
+                    
+                    <div class="ai-suggestions">
+                        <h4>🤖 AI Suggestions</h4>
+                        <div class="suggestion-item" onclick="applySuggestion('headline', 'Revolutionize Your Data Strategy with AI')">
+                            Try: "Revolutionize Your Data Strategy with AI"
+                        </div>
+                        <div class="suggestion-item" onclick="applySuggestion('cta', 'Get Started Today')">
+                            Alternative CTA: "Get Started Today"
+                        </div>
+                        <div class="suggestion-item" onclick="applySuggestion('background', 'gradient')">
+                            Switch to purple gradient theme
+                        </div>
+                    </div>
+                `,
+                'features': `
+                    <div class="property-group">
+                        <h4>Layout</h4>
+                        <div class="property-item">
+                            <label class="property-label">Columns</label>
+                            <select class="property-input">
+                                <option value="3" selected>3 Columns</option>
+                                <option value="2">2 Columns</option>
+                                <option value="4">4 Columns</option>
+                            </select>
+                        </div>
+                        <div class="property-item">
+                            <label class="property-label">Spacing</label>
+                            <input type="range" class="property-input" min="20" max="80" value="40">
+                        </div>
+                    </div>
+                    
+                    <div class="ai-suggestions">
+                        <h4>🤖 AI Suggestions</h4>
+                        <div class="suggestion-item">
+                            Add testimonials section below features
+                        </div>
+                        <div class="suggestion-item">
+                            Include pricing tiers for comparison
+                        </div>
+                        <div class="suggestion-item">
+                            Add interactive demo previews
+                        </div>
+                    </div>
+                `,
+                'footer': `
+                    <div class="property-group">
+                        <h4>Content</h4>
+                        <div class="property-item">
+                            <label class="property-label">Title</label>
+                            <input type="text" class="property-input" value="Ready to get started?">
+                        </div>
+                        <div class="property-item">
+                            <label class="property-label">Contact Info</label>
+                            <input type="text" class="property-input" value="hello@aianalytics.com | (555) 123-4567">
+                        </div>
+                    </div>
+                    
+                    <div class="ai-suggestions">
+                        <h4>🤖 AI Suggestions</h4>
+                        <div class="suggestion-item">
+                            Add social media links
+                        </div>
+                        <div class="suggestion-item">
+                            Include newsletter signup
+                        </div>
+                        <div class="suggestion-item">
+                            Add privacy policy links
+                        </div>
+                    </div>
+                `
+            };
+            
+            propertiesContent.innerHTML = propertyPanels[type] || `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚙️</div>
+                    <p>Select a component to edit its properties</p>
+                </div>
+            `;
+        }
+        
+        function updateContent(value, selector) {
+            const element = document.querySelector('.product-header.selected ' + selector);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+        
+        function updateButtonText(value) {
+            const button = document.querySelector('.product-header.selected .cta-button');
+            if (button) {
+                button.textContent = value;
+            }
+        }
+        
+        function updateHeroBackground(color) {
+            const hero = document.querySelector('.product-header.selected');
+            if (hero) {
+                hero.style.background = `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`;
+            }
+        }
+        
+        function applySuggestion(type, value) {
+            switch(type) {
+                case 'headline':
+                    updateContent(value, 'h1');
+                    document.querySelector('input[value*="Unlock Insights"]').value = value;
+                    break;
+                case 'cta':
+                    updateButtonText(value);
+                    document.querySelector('input[value*="Start Free Trial"]').value = value;
+                    break;
+                case 'background':
+                    updateHeroBackground('#667eea');
+                    break;
+            }
+        }
+        
+        function toggleCode() {
+            alert('Code view would show the generated React/HTML/CSS components that make up this product.');
+        }
+        
+        function exportProduct() {
+            alert('Export would package this as a downloadable project with all components, assets, and documentation.');
+        }
+        
+        function deployProduct() {
+            alert('Deploy would push this working product to a staging environment or connect to your deployment pipeline.');
+        }
+        
+        // Initialize with empty state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-generate on load for demo purposes
+            setTimeout(() => {
+                generateProduct();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

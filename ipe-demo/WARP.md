@@ -1,0 +1,125 @@
+# WARP.md
+
+This file provides guidance to WARP (warp.dev) when working with code in this repository.
+
+## Project Overview
+
+This repository contains interactive HTML prototypes demonstrating the **Intelligent Product Engine (IPE)** - an AI-powered system that transforms text prompts into functional web products. The demos showcase three sophisticated systems working together:
+
+1. **Ingestion Agent ("Slurper")** - Analyzes prompts and existing assets to understand design patterns and requirements
+2. **MCP Server** - Serves as queryable source of truth with design system context and industry insights  
+3. **Composition Assistant** - Generates production-ready components with governance enforcement
+
+## Architecture Overview
+
+### Core Components
+
+**Frontend Architecture:**
+- Pure HTML/CSS/JavaScript implementations (no build process required)
+- Component-based UI with interactive selection and property editing
+- Real-time preview generation with simulated AI processing
+- Three-panel layout: Input/Tree → Canvas → Properties
+
+**Design System Integration:**
+- **Toby Design System** (`toby_*.html`): Professional business-focused styling with purple/blue gradients
+- **Knapsack Design System** (`ipe_*.html`): Technical/developer-focused dark themes
+- Consistent token-based approach with CSS custom properties for colors, spacing, typography
+
+**Data Flow:**
+```
+User Prompt → Ingestion Analysis → MCP Context Query → AI Generation → Component Tree + Live Preview
+```
+
+### File Structure
+
+- `toby_ipe_demo.html` - Main product generation demo using Toby design system
+- `toby_under_hood_demo.html` - Technical deep dive showing internal processing (Toby theme)
+- `ipe_demo_prototype.html` - Alternative implementation with Knapsack design system  
+- `ipe_under_hood_demo.html` - Technical architecture visualization (dark theme)
+
+## Common Development Tasks
+
+### Running the Demos
+
+```bash
+# Serve locally (any HTTP server works)
+python3 -m http.server 8000
+# or
+npx serve .
+# or
+php -S localhost:8000
+
+# Open in browser
+open http://localhost:8000/toby_ipe_demo.html
+```
+
+### Testing Different Scenarios
+
+```bash
+# Test all demo variations
+open http://localhost:8000/toby_ipe_demo.html
+open http://localhost:8000/ipe_demo_prototype.html  
+open http://localhost:8000/toby_under_hood_demo.html
+open http://localhost:8000/ipe_under_hood_demo.html
+```
+
+### Making Design System Changes
+
+**For Toby Design System:**
+- Modify CSS custom properties in `:root` section of `toby_*.html` files
+- Primary colors: `--color-primary: #6436bf`, `--color-secondary: #e43a5c`
+- Follow established spacing scale (`--space-1` through `--space-16`)
+
+**For Knapsack Design System:**  
+- Update variables in `ipe_*.html` files
+- Uses darker themes with blue/purple accents (`#60a5fa`, `#a78bfa`)
+- Maintains consistent component structure across both systems
+
+### Simulating AI Processing
+
+The demos use `setTimeout()` to simulate real AI processing with realistic timing:
+- Ingestion analysis: ~800ms
+- MCP context query: ~1.2s  
+- Component generation: ~2.3s
+- Total generation time: ~3s
+
+To modify timing, update the `setTimeout` delays in the JavaScript sections.
+
+## Key Technical Patterns
+
+### Component Selection System
+Both demos implement a unified selection model:
+- Click any generated component to select it
+- Selection highlights the component and populates property panel
+- Tree view mirrors the component hierarchy with synchronized selection
+
+### Mock Data Generation
+The `createMockStructure()` function demonstrates different AI modes:
+- `analyze` - Breaks down requirements and user stories
+- `structure` - Suggests technical architecture  
+- `features` - Generates smart features and enhancements
+- `optimize` - Focuses on UX optimizations and performance
+
+### CSS Architecture
+- Token-based design system with comprehensive custom properties
+- Responsive grid layouts with `minmax()` for adaptability  
+- Consistent component patterns (cards, buttons, form elements)
+- Dark/light theme variants maintained in parallel
+
+### Interactive Features
+- Real-time property editing with immediate visual feedback
+- Animated processing logs with syntax-highlighted JSON
+- Flow visualization with pulse animations showing data movement
+- AI suggestion panels with contextual recommendations
+
+## Browser Compatibility
+
+- Modern browsers supporting CSS Grid, Flexbox, and Custom Properties
+- ES6+ JavaScript features (arrow functions, template literals, async/await simulation)
+- No transpilation required - runs directly in browser
+
+## Internal Usage Notes
+
+All demo files include "For Knapsack internal usage only" banners and are designed for internal demonstrations of the IPE concept. The demos simulate the full IPE experience without requiring backend services or actual AI integration.
+
+The technical deep dive demos show realistic JSON API responses and processing logs that would be generated by the actual IPE system when implemented.
